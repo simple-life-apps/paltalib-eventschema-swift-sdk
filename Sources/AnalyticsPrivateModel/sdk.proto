@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+message EventCommon {
+  sint64 event_ts = 1;
+  optional sint64 session_id = 2;
+  optional sint64 session_event_seq_num = 3;
+}
+
+message Event {
+  EventCommon common = 1;
+  bytes header = 2;
+  bytes payload = 3;
+}
+
+message BatchCommon {
+  string instance_id = 1;
+  string batch_id = 2;
+  optional string country_code = 3;
+  optional string locale = 4;
+  optional sint64 utc_offset = 5;
+}
+
+message Batch {
+  BatchCommon common = 1;
+  bytes context = 2;
+  repeated Event events = 3;
+}
