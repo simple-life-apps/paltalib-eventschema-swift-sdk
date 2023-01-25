@@ -40,7 +40,7 @@ let package = Package(
             name: "PaltaAnalyticsWiring",
             dependencies: [],
             path: "Sources/AnalyticsWiring",
-            publicHeadersPath: nil
+            publicHeadersPath: "Public"
         ),
         .target(
             name: "PaltaAnalyticsModel",
