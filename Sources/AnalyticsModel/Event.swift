@@ -13,4 +13,6 @@ public protocol Event {
     
     var header: Header? { get }
     var payload: Payload { get }
+    
+    func asJSON() -> [String: Any]
 }

@@ -24,4 +24,8 @@ final class EventMock: Event {
     var type: Int {
         0
     }
+    
+    func asJSON() -> [String : Any] {
+        [:]
+    }
 }
