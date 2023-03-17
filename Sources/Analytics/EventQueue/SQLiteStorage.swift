@@ -22,12 +22,17 @@ final class SQLiteStorage {
     static func openDatabase(at url: URL) throws -> OpaquePointer {
         var pointer: OpaquePointer?
         
-        let result = sqlite3_open_v2(
-            url.path.withCString { $0 },
-            &pointer,
-            SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
-            UnsafePointer(nil as UnsafePointer<Int>?)
-        )
+        var result: Int32 = -999
+        
+        url.path.withCString {
+            result = sqlite3_open_v2(
+                $0,
+                &pointer,
+                SQLITE_OPEN_FULLMUTEX | SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE,
+                UnsafePointer(nil as UnsafePointer<Int>?)
+            )
+        }
+        
         
         guard result == SQLITE_OK, let pointer = pointer else {
             throw SQliteError.databaseCantBeOpen

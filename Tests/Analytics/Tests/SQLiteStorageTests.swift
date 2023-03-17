@@ -31,6 +31,29 @@ final class SQLiteStorageTests: XCTestCase {
         try fileManager.removeItem(at: testURL)
     }
     
+    func testSaveEventInOneSession() throws {
+        let event = StorableEvent(
+            event: IdentifiableEvent(id: .init(), event: BatchEvent()),
+            contextId: .init()
+        )
+        
+        storage.storeEvent(event)
+        
+        var restoredEvent: StorableEvent?
+        let loadFinished = expectation(description: "Load finished")
+        
+        storage.loadEvents {
+            restoredEvent = $0.first
+            loadFinished.fulfill()
+        }
+        
+        wait(for: [loadFinished], timeout: 0.1)
+        
+        XCTAssertEqual(restoredEvent?.contextId, event.contextId)
+        XCTAssertEqual(restoredEvent?.event.id, event.event.id)
+        XCTAssertEqual(restoredEvent?.event.event.timestamp, event.event.event.timestamp)
+    }
+    
     func testSaveEvent() throws {
         let event = StorableEvent(
             event: IdentifiableEvent(id: .init(), event: BatchEvent()),
