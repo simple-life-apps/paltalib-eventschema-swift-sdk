@@ -9,9 +9,14 @@ import Foundation
 import PaltaAnalyticsModel
 
 final class EventMock: Event {
+    
     typealias Header = EventHeaderMock
     typealias Payload = EventPayloadMock
     typealias EventType = Int
+    
+    var name: String {
+        "Mock"
+    }
     
     var header: EventHeaderMock? {
         EventHeaderMock()
