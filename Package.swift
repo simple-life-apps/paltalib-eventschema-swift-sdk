@@ -21,7 +21,7 @@ let package = Package(
         )
     ],
     dependencies: [
-         .package(url: "https://github.com/Palta-Data-Platform/paltalib-swift-core.git", from: "3.0.0"),
+         .package(url: "https://github.com/Palta-Data-Platform/paltalib-swift-core.git", from: "3.1.0"),
          .package(url: "https://github.com/apple/swift-protobuf.git", from: "1.6.0"),
          .package(url: "https://github.com/krzysztofzablocki/Difference.git", from: "1.0.2")
     ],

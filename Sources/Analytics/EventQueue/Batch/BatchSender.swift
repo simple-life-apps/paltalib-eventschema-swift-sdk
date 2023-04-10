@@ -83,6 +83,9 @@ private struct ErrorHandler {
         case .urlError(let error) where error.code == .timedOut:
             completion(.failure(.timeout))
             
+        case .urlError(let error):
+            completion(.failure(.networkError(error)))
+            
         default:
             completion(.failure(.unknown))
         }
