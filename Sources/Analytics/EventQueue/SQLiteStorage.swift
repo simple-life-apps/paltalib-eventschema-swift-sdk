@@ -97,6 +97,23 @@ extension SQLiteStorage: BatchStorage {
         }
     }
     
+    func loadBatches() throws -> [PaltaAnalyticsPrivateModel.Batch] {
+        try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
+            var results: [Batch] = []
+            
+            while executor.runQuery(), let row = executor.getRow() {
+                do {
+                    let batch = try Batch(data: row.column2)
+                    results.append(batch)
+                } catch {
+                    print("PaltaLib: Analytics: Error loading single batch: \(error)")
+                }
+            }
+            
+            return results
+        }
+    }
+    
     func saveBatch<IDS: Collection>(_ batch: Batch, with eventIds: IDS) throws where IDS.Element == UUID {
         do {
             try client.executeStatement("BEGIN TRANSACTION")
@@ -116,6 +133,13 @@ extension SQLiteStorage: BatchStorage {
     
     func removeBatch() throws {
         try client.executeStatement("DELETE FROM batches WHERE TRUE")
+    }
+    
+    func removeBatch(_ batch: Batch) throws {
+        try client.executeStatement("DELETE FROM batches WHERE batch_id = ?") { executor in
+            executor.setValue(batch.batchId.data)
+            try executor.runStep()
+        }
     }
     
     private func doSaveBatch(_ batch: Batch) throws {

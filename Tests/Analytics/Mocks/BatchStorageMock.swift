@@ -11,16 +11,26 @@ import PaltaAnalyticsPrivateModel
 
 final class BatchStorageMock: BatchStorage {
     var batchToLoad: Batch?
+    var batchesToLoad: [Batch] = []
     var batchLoadError: Error?
     var savedBatch: Batch?
     var eventIds: Set<UUID> = []
     var batchRemoved = false
+    var batchRemovedId: UUID?
     
     func loadBatch() throws -> Batch? {
         if let batchLoadError = batchLoadError {
             throw batchLoadError
         } else {
             return batchToLoad
+        }
+    }
+    
+    func loadBatches() throws -> [Batch] {
+        if let batchLoadError = batchLoadError {
+            throw batchLoadError
+        } else {
+            return batchesToLoad
         }
     }
     
@@ -35,5 +45,9 @@ final class BatchStorageMock: BatchStorage {
     
     func removeBatch() throws {
         batchRemoved = true
+    }
+    
+    func removeBatch(_ batch: Batch) throws {
+        batchRemovedId = batch.batchId
     }
 }
