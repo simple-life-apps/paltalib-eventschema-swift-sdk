@@ -86,4 +86,23 @@ final class BatchQueueTests: XCTestCase {
         
         XCTAssert(queue.isEmpty)
     }
+    
+    func testAddSequence() {
+        var batch1 = Batch()
+        batch1.events = [Event(timestamp: 8)]
+        
+        var batch2 = Batch()
+        batch2.events = [Event(timestamp: 15)]
+        
+        var batch3 = Batch()
+        batch3.events = [Event(timestamp: 32)]
+        
+        queue.addBatch(batch1)
+        queue.addBatch(batch3)
+        queue.addBatch(batch2)
+        
+        XCTAssertEqual(queue.popBatch(), batch1)
+        XCTAssertEqual(queue.popBatch(), batch2)
+        XCTAssertEqual(queue.popBatch(), batch3)
+    }
 }

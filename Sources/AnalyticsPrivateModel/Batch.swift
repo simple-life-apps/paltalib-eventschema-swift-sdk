@@ -17,6 +17,10 @@ public extension Batch {
         return batchId
     }
     
+    var maxTimestamp: Int {
+        events.map { Int($0.common.eventTs) }.max() ?? 0
+    }
+    
     init(common: BatchCommon, context: Data, events: [Event]) {
         self.common = common
         self.context = context

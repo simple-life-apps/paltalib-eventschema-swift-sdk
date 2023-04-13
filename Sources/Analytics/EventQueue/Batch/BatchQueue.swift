@@ -28,7 +28,13 @@ final class BatchQueueImpl: BatchQueue {
     
     func addBatch(_ batch: Batch) {
         lock.lock()
-        queue.append(batch)
+        let index = queue.firstIndex(where: { $0.maxTimestamp > batch.maxTimestamp }) ?? queue.count
+        
+        queue.insert(
+            batch,
+            at: index
+        )
+        
         onNewBatch?()
         lock.unlock()
     }
