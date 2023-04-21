@@ -1,5 +1,5 @@
 //
-//  BatchSendController2Tests.swift
+//  BatchSendControllerTests.swift
 //  
 //
 //  Created by Vyacheslav Beltyukov on 13/04/2023.
@@ -10,13 +10,13 @@ import XCTest
 import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
-final class BatchSendController2Tests: XCTestCase {
+final class BatchSendControllerTests: XCTestCase {
     private var queueMock: BatchQueueMock!
     private var storageMock: BatchStorageMock!
     private var senderMock: BatchSenderMock!
     private var timerMock: TimerMock!
     
-    private var controller: BatchSendController2!
+    private var controller: BatchSendController!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -207,7 +207,7 @@ final class BatchSendController2Tests: XCTestCase {
     }
     
     private func reinit() {
-        controller = BatchSendController2(
+        controller = BatchSendController(
             batchQueue: queueMock,
             batchStorage: storageMock,
             batchSender: senderMock,

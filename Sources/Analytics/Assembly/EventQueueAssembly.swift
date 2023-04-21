@@ -12,7 +12,7 @@ import PaltaAnalyticsModel
 final class EventQueueAssembly {
     let eventQueue: EventQueueImpl
     let eventQueueCore: EventQueueCoreImpl
-    let batchSendController: BatchSendController2
+    let batchSendController: BatchSendController
     let batchSender: BatchSenderImpl
     let contextModifier: ContextModifier
     let eventToBatchQueueBridge: EventToBatchQueueBridge
@@ -20,7 +20,7 @@ final class EventQueueAssembly {
     init(
         eventQueue: EventQueueImpl,
         eventQueueCore: EventQueueCoreImpl,
-        batchSendController: BatchSendController2,
+        batchSendController: BatchSendController,
         batchSender: BatchSenderImpl,
         contextModifier: ContextModifier,
         eventToBatchQueueBridge: EventToBatchQueueBridge
@@ -90,7 +90,7 @@ extension EventQueueAssembly {
         
         let batchQueue = BatchQueueImpl()
         
-        let sendController = BatchSendController2(
+        let sendController = BatchSendController(
             batchQueue: batchQueue,
             batchStorage: sqliteStorage,
             batchSender: batchSender,

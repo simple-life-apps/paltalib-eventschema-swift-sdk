@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  BatchSendController.swift
 //  
 //
 //  Created by Vyacheslav Beltyukov on 13/04/2023.
@@ -8,7 +8,7 @@
 import Foundation
 import PaltaAnalyticsPrivateModel
 
-final class BatchSendController2 {
+final class BatchSendController {
     private var isReady = false
     
     private let lock = NSRecursiveLock()
