@@ -8,7 +8,7 @@
 import Foundation
 import PaltaAnalyticsPrivateModel
 
-protocol BatchQueue {
+protocol BatchQueue: AnyObject {
     var isEmpty: Bool { get }
     var onNewBatch: (() -> Void)? { get set }
     
