@@ -12,22 +12,25 @@ import PaltaAnalyticsModel
 final class EventQueueAssembly {
     let eventQueue: EventQueueImpl
     let eventQueueCore: EventQueueCoreImpl
-    let batchSendController: BatchSendControllerImpl
+    let batchSendController: BatchSendController2
     let batchSender: BatchSenderImpl
     let contextModifier: ContextModifier
+    let eventToBatchQueueBridge: EventToBatchQueueBridge
     
     init(
         eventQueue: EventQueueImpl,
         eventQueueCore: EventQueueCoreImpl,
-        batchSendController: BatchSendControllerImpl,
+        batchSendController: BatchSendController2,
         batchSender: BatchSenderImpl,
-        contextModifier: ContextModifier
+        contextModifier: ContextModifier,
+        eventToBatchQueueBridge: EventToBatchQueueBridge
     ) {
         self.eventQueue = eventQueue
         self.eventQueueCore = eventQueueCore
         self.batchSendController = batchSendController
         self.batchSender = batchSender
         self.contextModifier = contextModifier
+        self.eventToBatchQueueBridge = eventToBatchQueueBridge
     }
 }
 
@@ -85,11 +88,20 @@ extension EventQueueAssembly {
             httpClient: coreAssembly.httpClient
         )
         
-        let sendController = BatchSendControllerImpl(
-            batchComposer: batchComposer,
+        let batchQueue = BatchQueueImpl()
+        
+        let sendController = BatchSendController2(
+            batchQueue: batchQueue,
             batchStorage: sqliteStorage,
             batchSender: batchSender,
             timer: TimerImpl()
+        )
+        
+        let eventToBatchQueueBridge = EventToBatchQueueBridge(
+            eventQueue: core,
+            batchQueue: BatchQueueImpl(),
+            batchComposer: batchComposer,
+            batchStorage: sqliteStorage
         )
         
         // EventQueue
@@ -98,7 +110,6 @@ extension EventQueueAssembly {
             stack: stack,
             core: core,
             storage: sqliteStorage,
-            sendController: sendController,
             eventComposer: eventComposer,
             sessionManager: analyticsCoreAssembly.sessionManager,
             contextProvider: currentContextManager,
@@ -110,7 +121,8 @@ extension EventQueueAssembly {
             eventQueueCore: core,
             batchSendController: sendController,
             batchSender: batchSender,
-            contextModifier: currentContextManager
+            contextModifier: currentContextManager,
+            eventToBatchQueueBridge: eventToBatchQueueBridge
         )
     }
 }

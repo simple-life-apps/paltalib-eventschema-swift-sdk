@@ -9,7 +9,7 @@ import Foundation
 import PaltaAnalyticsPrivateModel
 
 final class BatchSendController2 {
-    private var isReady = true
+    private var isReady = false
     
     private let lock = NSRecursiveLock()
     
@@ -30,6 +30,11 @@ final class BatchSendController2 {
         self.timer = timer
         
         setup()
+    }
+    
+    func configurationFinished() {
+        isReady = true
+        sendNextBatch()
     }
     
     private func setup() {

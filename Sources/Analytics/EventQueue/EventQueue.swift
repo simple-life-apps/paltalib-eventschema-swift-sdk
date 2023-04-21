@@ -16,7 +16,6 @@ final class EventQueueImpl: EventQueue {
     private let stack: Stack
     private let core: EventQueueCore
     private let storage: EventStorage
-    private let sendController: BatchSendController
     private let eventComposer: EventComposer
     private let sessionManager: SessionManager
     private let contextProvider: CurrentContextProvider
@@ -26,7 +25,6 @@ final class EventQueueImpl: EventQueue {
         stack: Stack,
         core: EventQueueCore,
         storage: EventStorage,
-        sendController: BatchSendController,
         eventComposer: EventComposer,
         sessionManager: SessionManager,
         contextProvider: CurrentContextProvider,
@@ -35,14 +33,12 @@ final class EventQueueImpl: EventQueue {
         self.stack = stack
         self.core = core
         self.storage = storage
-        self.sendController = sendController
         self.eventComposer = eventComposer
         self.sessionManager = sessionManager
         self.contextProvider = contextProvider
         self.backgroundNotifier = backgroundNotifier
 
         setupCore(core, liveQueue: false)
-        setupSendController()
         startSessionManager()
         subscribeForBackgroundNotifications()
     }
@@ -84,23 +80,8 @@ final class EventQueueImpl: EventQueue {
         storage.storeEvent(storableEvent)
         core.addEvent(storableEvent)
     }
-    
-    private func setupSendController() {
-        sendController.isReadyCallback = { [core] in
-            core.sendEventsAvailable()
-        }
-    }
 
     private func setupCore(_ core: EventQueueCore, liveQueue: Bool) {
-        core.sendHandler = { [weak self] events, contextId, _ in
-            guard let self = self, self.sendController.isReady else {
-                return false
-            }
-            
-            self.sendController.sendBatch(of: events, with: contextId)
-            return true
-        }
-
         core.removeHandler = { [weak self] in
             guard let self = self else { return }
 

@@ -13,7 +13,6 @@ import PaltaAnalyticsPrivateModel
 final class EventQueueTests: XCTestCase {
     private var coreMock: EventQueueCoreMock!
     private var storageMock: EventStorageMock!
-    private var sendControllerMock: BatchSendControllerMock!
     private var eventComposerMock: EventComposerMock!
     private var sessionManagerMock: SessionManagerMock!
     private var contextProviderMock: CurrentContextProviderMock!
@@ -28,7 +27,6 @@ final class EventQueueTests: XCTestCase {
         storageMock = .init()
         eventComposerMock = .init()
         sessionManagerMock = .init()
-        sendControllerMock = .init()
         contextProviderMock = .init()
         backgroundNotifierMock = .init()
         
@@ -36,7 +34,6 @@ final class EventQueueTests: XCTestCase {
             stack: .mock,
             core: coreMock,
             storage: storageMock,
-            sendController: sendControllerMock,
             eventComposer: eventComposerMock,
             sessionManager: sessionManagerMock,
             contextProvider: contextProviderMock,
@@ -71,7 +68,6 @@ final class EventQueueTests: XCTestCase {
             stack: .mock,
             core: coreMock,
             storage: storageMock,
-            sendController: sendControllerMock,
             eventComposer: eventComposerMock,
             sessionManager: sessionManagerMock,
             contextProvider: contextProviderMock,
@@ -83,44 +79,10 @@ final class EventQueueTests: XCTestCase {
             coreMock.addedEvents.map { try $0.serialize() }
         )
         
-        XCTAssertNotNil(coreMock.sendHandler)
+        XCTAssertNil(coreMock.sendHandler)
         XCTAssertNotNil(coreMock.removeHandler)
-        XCTAssertNotNil(sendControllerMock.isReadyCallback)
         XCTAssert(sessionManagerMock.startCalled)
         XCTAssertNotNil(sessionManagerMock.sessionStartLogger)
-        XCTAssertFalse(coreMock.forceFlushTriggered)
-    }
-    
-    func testSendWhenAvailable() {
-        let contextId = UUID()
-        let events = [UUID(): BatchEvent.mock()]
-        sendControllerMock.isReady = true
-        
-        let result = coreMock.sendHandler?(events, contextId, .mock())
-        
-        XCTAssertEqual(result, true)
-        XCTAssertEqual(sendControllerMock.sentEvents, events)
-        XCTAssertEqual(sendControllerMock.contextId, contextId)
-        XCTAssertFalse(coreMock.forceFlushTriggered)
-    }
-    
-    func testSendWhenNotAvailable() {
-        let contextId = UUID()
-        let events = [UUID(): BatchEvent.mock()]
-        sendControllerMock.isReady = false
-        
-        let result = coreMock.sendHandler?(events, contextId, .mock())
-        
-        XCTAssertEqual(result, false)
-        XCTAssertNil(sendControllerMock.sentEvents)
-        XCTAssertNil(sendControllerMock.contextId)
-        XCTAssertFalse(coreMock.forceFlushTriggered)
-    }
-    
-    func testNotifyWhenAvailable() {
-        sendControllerMock.isReadyCallback?()
-        
-        XCTAssert(coreMock.sendEventsTriggered)
         XCTAssertFalse(coreMock.forceFlushTriggered)
     }
 
