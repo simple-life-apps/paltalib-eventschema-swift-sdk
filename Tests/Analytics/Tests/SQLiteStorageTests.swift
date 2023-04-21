@@ -199,7 +199,7 @@ final class SQLiteStorageTests: XCTestCase {
 
         wait(for: [eventsLoaded], timeout: 0.05)
         
-        XCTAssertEqual(try storage.loadBatch(), batch)
+        XCTAssertEqual(try storage.loadBatches().first, batch)
     }
     
     func testLoadBatches() throws {
@@ -222,19 +222,6 @@ final class SQLiteStorageTests: XCTestCase {
         XCTAssertEqual(Set(try storage.loadBatches()), [batch1, batch2, batch3])
     }
     
-    func testBatchRemove() throws {
-        var batch = Batch()
-        batch.common.batchID = UUID().uuidString
-
-        try storage.saveBatch(batch, with: [])
-        
-        try reinitStorage()
-        try storage.removeBatch()
-        
-        try reinitStorage()
-        XCTAssertNil(try storage.loadBatch())
-    }
-    
     func testSpecificBatchRemoval() throws {
         var batch1 = Batch()
         batch1.common.batchID = UUID().uuidString
@@ -254,10 +241,6 @@ final class SQLiteStorageTests: XCTestCase {
         
         try reinitStorage()
         XCTAssertEqual(Set(try storage.loadBatches()), [batch1, batch3])
-    }
-    
-    func testBatchLoadNoBatch() throws {
-        XCTAssertNil(try storage.loadBatch())
     }
     
     private func reinitStorage() throws {

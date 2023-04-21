@@ -90,13 +90,6 @@ extension SQLiteStorage: EventStorage {
 }
 
 extension SQLiteStorage: BatchStorage {
-    func loadBatch() throws -> Batch? {
-        try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
-            executor.runQuery()
-            return try executor.getRow().map { try Batch(data: $0.column2) }
-        }
-    }
-    
     func loadBatches() throws -> [PaltaAnalyticsPrivateModel.Batch] {
         try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
             var results: [Batch] = []
@@ -129,10 +122,6 @@ extension SQLiteStorage: BatchStorage {
             try client.executeStatement("ROLLBACK TRANSACTION")
             throw error
         }
-    }
-    
-    func removeBatch() throws {
-        try client.executeStatement("DELETE FROM batches WHERE TRUE")
     }
     
     func removeBatch(_ batch: Batch) throws {
