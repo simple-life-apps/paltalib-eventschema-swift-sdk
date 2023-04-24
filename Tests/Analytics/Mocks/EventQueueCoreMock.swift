@@ -8,7 +8,7 @@
 import Foundation
 @testable import PaltaAnalytics
 
-final class EventQueueCoreMock: EventQueueCore {
+final class EventQueueCoreMock: EventQueue {
     var sendHandler: UploadHandler?
     var removeHandler: RemoveHandler?
     

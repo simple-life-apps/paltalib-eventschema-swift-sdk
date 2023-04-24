@@ -9,13 +9,13 @@ import Foundation
 import PaltaAnalyticsPrivateModel
 
 final class EventToBatchQueueBridge {
-    private let eventQueue: EventQueueCore
+    private let eventQueue: EventQueue
     private let batchQueue: BatchQueue
     private let batchComposer: BatchComposer
     private let batchStorage: BatchStorage
     
     init(
-        eventQueue: EventQueueCore,
+        eventQueue: EventQueue,
         batchQueue: BatchQueue,
         batchComposer: BatchComposer,
         batchStorage: BatchStorage

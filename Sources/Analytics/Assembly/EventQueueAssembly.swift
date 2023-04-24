@@ -11,7 +11,7 @@ import PaltaAnalyticsModel
 
 final class EventQueueAssembly {
     let eventQueue: EventFacadeImpl
-    let eventQueueCore: EventQueueCoreImpl
+    let eventQueueCore: EventQueueImpl
     let batchSendController: BatchSendController
     let batchSender: BatchSenderImpl
     let contextModifier: ContextModifier
@@ -19,7 +19,7 @@ final class EventQueueAssembly {
     
     init(
         eventQueue: EventFacadeImpl,
-        eventQueueCore: EventQueueCoreImpl,
+        eventQueueCore: EventQueueImpl,
         batchSendController: BatchSendController,
         batchSender: BatchSenderImpl,
         contextModifier: ContextModifier,
@@ -55,7 +55,7 @@ extension EventQueueAssembly {
         
         // Core
         
-        let core = EventQueueCoreImpl(timer: TimerImpl())
+        let core = EventQueueImpl(timer: TimerImpl())
         
         let eventComposer = EventComposerImpl(
             sessionProvider: analyticsCoreAssembly.sessionManager

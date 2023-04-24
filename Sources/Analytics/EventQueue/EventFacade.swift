@@ -14,7 +14,7 @@ protocol EventFacade {
 
 final class EventFacadeImpl: EventFacade {
     private let stack: Stack
-    private let core: EventQueueCore
+    private let core: EventQueue
     private let storage: EventStorage
     private let eventComposer: EventComposer
     private let sessionManager: SessionManager
@@ -23,7 +23,7 @@ final class EventFacadeImpl: EventFacade {
 
     init(
         stack: Stack,
-        core: EventQueueCore,
+        core: EventQueue,
         storage: EventStorage,
         eventComposer: EventComposer,
         sessionManager: SessionManager,
@@ -81,7 +81,7 @@ final class EventFacadeImpl: EventFacade {
         core.addEvent(storableEvent)
     }
 
-    private func setupCore(_ core: EventQueueCore, liveQueue: Bool) {
+    private func setupCore(_ core: EventQueue, liveQueue: Bool) {
         core.removeHandler = { [weak self] in
             guard let self = self else { return }
 

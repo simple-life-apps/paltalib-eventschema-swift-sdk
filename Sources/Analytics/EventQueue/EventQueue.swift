@@ -1,5 +1,5 @@
 //
-//  EventQueueCore.swift
+//  EventQueue.swift
 //  PaltaAnalytics
 //
 //  Created by Vyacheslav Beltyukov on 06/06/2022.
@@ -16,7 +16,7 @@ struct EventQueueConfig {
     let maxEvents: Int
 }
 
-protocol EventQueueCore: AnyObject {
+protocol EventQueue: AnyObject {
     typealias UploadHandler = ([UUID: BatchEvent], UUID, Telemetry) -> Bool
     typealias RemoveHandler = (ArraySlice<StorableEvent>) -> Void
 
@@ -30,7 +30,7 @@ protocol EventQueueCore: AnyObject {
     func forceFlush()
 }
 
-final class EventQueueCoreImpl: EventQueueCore, FunctionalExtension {
+final class EventQueueImpl: EventQueue, FunctionalExtension {
     var sendHandler: UploadHandler?
     var removeHandler: RemoveHandler?
 
