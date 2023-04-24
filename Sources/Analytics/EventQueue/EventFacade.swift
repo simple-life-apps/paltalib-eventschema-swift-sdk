@@ -1,5 +1,5 @@
 //
-//  EventQueue.swift
+//  EventFacade.swift
 //  PaltaAnalytics
 //
 //  Created by Vyacheslav Beltyukov on 07/06/2022.
@@ -8,11 +8,11 @@
 import Foundation
 import PaltaAnalyticsModel
 
-protocol EventQueue {
+protocol EventFacade {
     func logEvent<E: Event>(_ incomingEvent: E)
 }
 
-final class EventQueueImpl: EventQueue {
+final class EventFacadeImpl: EventFacade {
     private let stack: Stack
     private let core: EventQueueCore
     private let storage: EventStorage

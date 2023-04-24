@@ -1,5 +1,5 @@
 //
-//  EventQueueTests.swift
+//  EventFacadeTests.swift
 //  PaltaLibTests
 //
 //  Created by Vyacheslav Beltyukov on 29/06/2022.
@@ -10,7 +10,7 @@ import XCTest
 import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
-final class EventQueueTests: XCTestCase {
+final class EventFacadeTests: XCTestCase {
     private var coreMock: EventQueueCoreMock!
     private var storageMock: EventStorageMock!
     private var eventComposerMock: EventComposerMock!
@@ -18,7 +18,7 @@ final class EventQueueTests: XCTestCase {
     private var contextProviderMock: CurrentContextProviderMock!
     private var backgroundNotifierMock: BackgroundNotifierMock!
     
-    private var eventQueue: EventQueueImpl!
+    private var eventQueue: EventFacadeImpl!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -30,7 +30,7 @@ final class EventQueueTests: XCTestCase {
         contextProviderMock = .init()
         backgroundNotifierMock = .init()
         
-        eventQueue = EventQueueImpl(
+        eventQueue = EventFacadeImpl(
             stack: .mock,
             core: coreMock,
             storage: storageMock,
