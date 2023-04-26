@@ -93,6 +93,10 @@ final class BatchSendController {
             // Expected error, do not log
             break
         }
+    
+        do {
+            try batchStorage.addErrorCode(error.errorCode, for: task.batch)
+        } catch {}
         
         guard let interval = task.nextRetryInterval(after: error) else {
             completeBatchSend(task.batch)
@@ -105,7 +109,15 @@ final class BatchSendController {
     }
     
     private func send(_ task: BatchSendTask) {
-        batchSender.sendBatch(task.batch, errorCodes: []) { [weak self] result in
+        let errorCodes: [Int]
+        
+        do {
+            errorCodes = try batchStorage.getErrorCodes(for: task.batch)
+        } catch {
+            errorCodes = []
+        }
+        
+        batchSender.sendBatch(task.batch, errorCodes: errorCodes) { [weak self] result in
             switch result {
             case .success:
                 self?.completeBatchSend(task.batch)

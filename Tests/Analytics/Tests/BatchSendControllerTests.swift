@@ -7,6 +7,7 @@
 
 import Foundation
 import XCTest
+import PaltaCore
 import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
@@ -133,6 +134,22 @@ final class BatchSendControllerTests: XCTestCase {
         
         XCTAssertNil(senderMock.batch)
         XCTAssertNil(storageMock.batchRemovedId)
+    }
+    
+    func testErrorCodeSavedOnFail() {
+        queueMock.batchesToPop = [.mock()]
+        senderMock.result = .failure(.badRequest)
+        controller.configurationFinished()
+        
+        XCTAssertEqual(storageMock.savedErrorCode, CategorisedNetworkError.badRequest.errorCode)
+    }
+    
+    func testErrorCodesPassedToSender() {
+        queueMock.batchesToPop = [.mock()]
+        storageMock.errorCodes = [777, 888, 999]
+        controller.configurationFinished()
+        
+        XCTAssertEqual(senderMock.errorCodes, [777, 888, 999])
     }
     
     private func reinit() {
