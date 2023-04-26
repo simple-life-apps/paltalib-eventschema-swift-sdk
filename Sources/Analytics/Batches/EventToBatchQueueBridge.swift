@@ -29,8 +29,8 @@ final class EventToBatchQueueBridge {
     }
     
     private func setup() {
-        eventQueue.sendHandler = { [weak self] events, contextId, _, _ in
-            self?.onFlush(events: events, contextId: contextId)
+        eventQueue.sendHandler = { [weak self] events, contextId, _, triggerType in
+            self?.onFlush(events: events, contextId: contextId, triggerType: triggerType)
             return true
         }
         
@@ -46,9 +46,9 @@ final class EventToBatchQueueBridge {
         }
     }
     
-    private func onFlush(events: [UUID: BatchEvent], contextId: UUID) {
+    private func onFlush(events: [UUID: BatchEvent], contextId: UUID, triggerType: TriggerType) {
         do {
-            let batch = try batchComposer.makeBatch(of: Array(events.values), with: contextId, triggerType: .minimise)
+            let batch = try batchComposer.makeBatch(of: Array(events.values), with: contextId, triggerType: triggerType)
             try batchStorage.saveBatch(batch, with: events.keys)
             batchQueue.addBatch(batch)
         } catch {

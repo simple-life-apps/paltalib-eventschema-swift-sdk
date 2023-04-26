@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum TriggerType: String {
+enum TriggerType: String, CaseIterable {
     case timer
     case count
     case context

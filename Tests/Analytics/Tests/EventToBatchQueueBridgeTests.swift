@@ -69,6 +69,13 @@ final class EventToBatchQueueBridgeTests: XCTestCase {
         XCTAssertEqual(batchQueueMock.addedBatches.count, 1)
     }
     
+    func testTriggerTypePassing() {
+        TriggerType.allCases.forEach {
+            _ = eventQueueMock.sendHandler?([UUID(): .mock()], UUID(), .mock(), $0)
+            XCTAssertEqual(batchComposerMock.triggerType, $0)
+        }
+    }
+    
     private func reinitBridge() {
         bridge = EventToBatchQueueBridge(
             eventQueue: eventQueueMock,
