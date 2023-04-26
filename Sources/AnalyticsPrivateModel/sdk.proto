@@ -1,3 +1,5 @@
+// This proto file is edited manually
+// Run `paltabrain-build-python-sdk` to rebuild module
 syntax = "proto3";
 
 message EventCommon {
@@ -20,8 +22,21 @@ message BatchCommon {
   optional sint64 utc_offset = 5;
 }
 
+message BatchTelemetry {
+  optional sint64 events_dropped = 1;
+  optional string prev_connection_speed = 2;
+  optional sint64 prev_request_time = 3;
+  optional string events_reporting_speed = 4;
+  repeated string serialization_errors = 5;
+  repeated string storage_errors = 6;
+  optional string storage_used = 7;
+  optional string trigger_type = 8;
+  optional sint64 time_since_last_batch = 9;
+}
+
 message Batch {
   BatchCommon common = 1;
   bytes context = 2;
   repeated Event events = 3;
+  BatchTelemetry telemetry = 4;
 }
