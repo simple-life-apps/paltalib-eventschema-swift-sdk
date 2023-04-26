@@ -6,9 +6,12 @@
 //
 
 import Foundation
+import PaltaCore
 import PaltaAnalyticsPrivateModel
 
 final class BatchSendController {
+    typealias BatchSendTaskProvider = (Batch) -> BatchSendTask
+    
     private var isReady = false
     
     private let lock = NSRecursiveLock()
@@ -18,16 +21,20 @@ final class BatchSendController {
     private let batchSender: BatchSender
     private let timer: PaltaTimer
     
+    private let taskProvider: BatchSendTaskProvider
+    
     init(
         batchQueue: BatchQueue,
         batchStorage: BatchStorage,
         batchSender: BatchSender,
-        timer: PaltaTimer
+        timer: PaltaTimer,
+        taskProvider: @escaping BatchSendTaskProvider
     ) {
         self.batchQueue = batchQueue
         self.batchStorage = batchStorage
         self.batchSender = batchSender
         self.timer = timer
+        self.taskProvider = taskProvider
         
         setup()
     }
@@ -54,7 +61,7 @@ final class BatchSendController {
         }
         
         isReady = false
-        send(batch)
+        send(taskProvider(batch))
     }
     
     private func completeBatchSend(_ batch: Batch) {
@@ -71,47 +78,41 @@ final class BatchSendController {
         lock.unlock()
     }
     
-    private func handle(_ error: BatchSendError, for batch: Batch, retryCount: Int) {
+    private func handle(_ error: CategorisedNetworkError, for task: BatchSendTask) {
         switch error {
         case .notConfigured:
             print("PaltaLib: Analytics: Batch send failed due to SDK misconfiguration")
-            scheduleBatchSend(batch, retryCount: retryCount + 1)
             
-        case .serializationError:
+        case .badRequest:
             print("PaltaLib: Analytics: Batch send failed due to serialization error")
-            completeBatchSend(batch)
-            
-        case .networkError,.serverError, .noInternet, .timeout:
-            scheduleBatchSend(batch, retryCount: retryCount + 1)
             
         case .unknown:
             print("PaltaLib: Analytics: Batch send failed due to unknown error")
-            completeBatchSend(batch)
+            
+        default:
+            // Expected error, do not log
+            break
         }
-    }
-    
-    private func send(_ batch: Batch, retryCount: Int = 0) {
-        batchSender.sendBatch(batch) { [weak self] result in
-            switch result {
-            case .success:
-                self?.completeBatchSend(batch)
-                
-            case .failure(let error):
-                self?.handle(error, for: batch, retryCount: retryCount)
-            }
-        }
-    }
-    
-    private func scheduleBatchSend(_ batch: Batch, retryCount: Int) {
-        guard retryCount <= 10 else {
-            completeBatchSend(batch)
+        
+        guard let interval = task.nextRetryInterval(after: error) else {
+            completeBatchSend(task.batch)
             return
         }
         
-        let interval = min(0.25 * pow(2, TimeInterval(retryCount)), 5 * 60)
-        
         timer.scheduleTimer(timeInterval: interval, on: .global(qos: .background)) { [weak self] in
-            self?.send(batch, retryCount: retryCount)
+            self?.send(task)
+        }
+    }
+    
+    private func send(_ task: BatchSendTask) {
+        batchSender.sendBatch(task.batch) { [weak self] result in
+            switch result {
+            case .success:
+                self?.completeBatchSend(task.batch)
+                
+            case .failure(let error):
+                self?.handle(error, for: task)
+            }
         }
     }
 }

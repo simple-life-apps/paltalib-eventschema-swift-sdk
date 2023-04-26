@@ -115,10 +115,10 @@ final class BatchSenderTests: XCTestCase {
         let failCalled = expectation(description: "Fail called")
         let batch = Batch()
         
-        httpMock.result = .failure(NetworkErrorWithoutResponse.invalidStatusCode(401, nil))
+        httpMock.result = .failure(NetworkErrorWithoutResponse.invalidStatusCode(418, nil))
         
         sender.sendBatch(batch) { result in
-            guard case .failure(let error) = result, case .unknown = error else {
+            guard case .failure(let error) = result, case .clientError(418) = error else {
                 return
             }
             

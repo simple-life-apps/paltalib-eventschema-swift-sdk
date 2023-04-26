@@ -10,18 +10,8 @@ import CoreData
 import PaltaCore
 import PaltaAnalyticsPrivateModel
 
-enum BatchSendError: Error {
-    case serializationError(Error)
-    case networkError(URLError)
-    case notConfigured
-    case serverError
-    case noInternet
-    case timeout
-    case unknown
-}
-
 protocol BatchSender {
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), BatchSendError>) -> Void)
+    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void)
 }
 
 final class BatchSenderImpl: BatchSender {
@@ -39,13 +29,13 @@ final class BatchSenderImpl: BatchSender {
         self.httpClient = httpClient
     }
     
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), BatchSendError>) -> Void) {
+    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
         let data: Data
         
         do {
             data = try batch.serialize()
         } catch {
-            completion(.failure(.serializationError(error)))
+            completion(.failure(.badRequest))
             return
         }
         
@@ -70,24 +60,9 @@ final class BatchSenderImpl: BatchSender {
 }
 
 private struct ErrorHandler {
-    let completion: (Result<Void, BatchSendError>) -> Void
+    let completion: (Result<Void, CategorisedNetworkError>) -> Void
     
     func handle(_ error: NetworkErrorWithoutResponse) {
-        switch error {
-        case .invalidStatusCode(let code, _) where (500...599).contains(code):
-            completion(.failure(.serverError))
-            
-        case .urlError(let error) where [.notConnectedToInternet, .cannotFindHost, .cannotConnectToHost].contains(error.code):
-            completion(.failure(.noInternet))
-            
-        case .urlError(let error) where error.code == .timedOut:
-            completion(.failure(.timeout))
-            
-        case .urlError(let error):
-            completion(.failure(.networkError(error)))
-            
-        default:
-            completion(.failure(.unknown))
-        }
+        completion(.failure(CategorisedNetworkError(error)))
     }
 }

@@ -10,6 +10,8 @@ import PaltaCore
 import PaltaAnalyticsPrivateModel
 
 protocol BatchSendTask: AnyObject {
+    var batch: Batch { get }
+    
     func nextRetryInterval(after error: CategorisedNetworkError) -> TimeInterval?
 }
 

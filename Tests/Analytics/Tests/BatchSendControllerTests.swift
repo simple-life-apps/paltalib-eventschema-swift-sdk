@@ -15,6 +15,7 @@ final class BatchSendControllerTests: XCTestCase {
     private var storageMock: BatchStorageMock!
     private var senderMock: BatchSenderMock!
     private var timerMock: TimerMock!
+    private var taskMock: BatchSendTaskMock!
     
     private var controller: BatchSendController!
     
@@ -25,12 +26,16 @@ final class BatchSendControllerTests: XCTestCase {
         storageMock = .init()
         senderMock = .init()
         timerMock = .init()
+        taskMock = .init()
         
         reinit()
     }
     
     func testSuccessfulSend() {
+        controller.configurationFinished()
+        
         let batch: Batch = .mock()
+        taskMock.batch = batch
         queueMock.batchesToPop = [batch]
         senderMock.result = .success(())
         
@@ -41,7 +46,10 @@ final class BatchSendControllerTests: XCTestCase {
     }
     
     func testSequentalSend() {
+        controller.configurationFinished()
+        
         let batch1: Batch = .mock()
+        taskMock.batch = batch1
         queueMock.batchesToPop = [batch1]
         senderMock.result = .success(())
         
@@ -51,6 +59,7 @@ final class BatchSendControllerTests: XCTestCase {
         XCTAssertEqual(storageMock.batchRemovedId, batch1.batchId)
         
         let batch2: Batch = .mock()
+        taskMock.batch = batch2
         queueMock.batchesToPop = [batch2]
         senderMock.result = .success(())
         
@@ -60,150 +69,70 @@ final class BatchSendControllerTests: XCTestCase {
         XCTAssertEqual(storageMock.batchRemovedId, batch2.batchId)
     }
     
-    func testUnknownError() {
+    func testNonRetriableError() {
+        controller.configurationFinished()
+        
         let batch: Batch = .mock()
+        taskMock.batch = batch
         queueMock.batchesToPop = [.mock(), batch]
+        
+        taskMock.batch = batch
+        taskMock.timeIntervalToReturn = nil
         
         queueMock.onNewBatch?()
         
         senderMock.feedCompletion( .failure(.unknown))
-        senderMock.feedCompletion(.success(()))
         
+        XCTAssertEqual(taskMock.errorReported, .unknown)
         XCTAssertNotNil(storageMock.batchRemovedId)
-        XCTAssertNotEqual(storageMock.batchRemovedId, batch.batchId)
-        XCTAssert(queueMock.batchesToPop.isEmpty)
-    }
-    
-    func testServerError() {
-        let batch: Batch = .mock()
-        queueMock.batchesToPop = [.mock(), batch]
-        
-        senderMock.result = .failure(.serverError)
-        
-        queueMock.onNewBatch?()
-
-        XCTAssertNil(storageMock.batchRemovedId)
-        XCTAssertFalse(queueMock.batchesToPop.isEmpty)
-        
-        storageMock.batchRemovedId = nil
-        
-        senderMock.result = .success(())
-        timerMock.fireAndWait()
-
-        XCTAssertNotNil(storageMock.batchRemovedId)
-    }
-    
-    func testNoInternet() {
-        let batch: Batch = .mock()
-        queueMock.batchesToPop = [.mock(), batch]
-        
-        senderMock.result = .failure(.noInternet)
-        
-        queueMock.onNewBatch?()
-
-        XCTAssertNil(storageMock.batchRemovedId)
-        XCTAssertFalse(queueMock.batchesToPop.isEmpty)
-        
-        storageMock.batchRemovedId = nil
-        
-        senderMock.result = .success(())
-        timerMock.fireAndWait()
-
-        XCTAssertNotNil(storageMock.batchRemovedId)
-    }
-    
-    func testTimeoutError() {
-        let batch: Batch = .mock()
-        queueMock.batchesToPop = [.mock(), batch]
-        
-        senderMock.result = .failure(.timeout)
-        
-        queueMock.onNewBatch?()
-
-        XCTAssertNil(storageMock.batchRemovedId)
-        XCTAssertFalse(queueMock.batchesToPop.isEmpty)
-        
-        storageMock.batchRemovedId = nil
-        
-        senderMock.result = .success(())
-        timerMock.fireAndWait()
-
-        XCTAssertNotNil(storageMock.batchRemovedId)
-    }
-    
-    func testURLError() {
-        let batch: Batch = .mock()
-        queueMock.batchesToPop = [batch]
-        
-        queueMock.onNewBatch?()
-        
-        senderMock.feedCompletion(.failure(.networkError(URLError(.backgroundSessionRequiresSharedContainer, userInfo: [:]))))
-        
-        XCTAssertNotNil(timerMock.passedInterval)
-        
-        timerMock.fireAndWait()
-        
-        senderMock.feedCompletion(.success(()))
-
         XCTAssertEqual(storageMock.batchRemovedId, batch.batchId)
         XCTAssert(queueMock.batchesToPop.isEmpty)
     }
     
-    func testNotConfiguredError() {
+    func testRetry() {
+        controller.configurationFinished()
+        
         let batch: Batch = .mock()
         queueMock.batchesToPop = [.mock(), batch]
         
-        senderMock.result = .failure(.notConfigured)
+        taskMock.batch = batch
+        taskMock.timeIntervalToReturn = 5.78
         
         queueMock.onNewBatch?()
-
-        XCTAssertNil(storageMock.batchRemovedId)
-        XCTAssertFalse(queueMock.batchesToPop.isEmpty)
         
-        storageMock.batchRemovedId = nil
+        senderMock.feedCompletion( .failure(.unknown))
         
-        senderMock.result = .success(())
+        XCTAssertEqual(taskMock.errorReported, .unknown)
+        XCTAssertEqual(timerMock.passedInterval, 5.78)
+        
+        senderMock.batch = nil
         timerMock.fireAndWait()
-
-        XCTAssertNotNil(storageMock.batchRemovedId)
-    }
-    
-    func testMaxRetry() {
-        let batch: Batch = .mock()
-        queueMock.batchesToPop = [.mock(), batch]
-        
-        senderMock.result = .failure(.notConfigured)
-        
-        var retryCount = 0
-        
-        senderMock.result = .failure(.notConfigured)
-        
-        queueMock.onNewBatch?()
-        
-        repeat {
-            timerMock.passedInterval = nil
-            timerMock.fireAndWait()
-            retryCount += 1
-            
-            if retryCount > 10 {
-                XCTAssert(false)
-            }
-        } while timerMock.passedInterval != nil
-        
-        XCTAssertEqual(retryCount, 10)
-        
-        XCTAssertNotNil(storageMock.batchRemovedId)
+        XCTAssertEqual(senderMock.batch, batch)
     }
     
     func testSendOldBatch() {
         let batch: Batch = .mock()
+        taskMock.batch = batch
         queueMock.batchesToPop = [batch]
         senderMock.result = .success(())
         
         reinit()
+        controller.configurationFinished()
         
         XCTAssertEqual(senderMock.batch, batch)
         XCTAssertEqual(storageMock.batchRemovedId, batch.batchId)
+    }
+    
+    func testNoSendUnconfigured() {
+        let batch: Batch = .mock()
+        taskMock.batch = batch
+        queueMock.batchesToPop = [batch]
+        senderMock.result = .success(())
+        
+        queueMock.onNewBatch?()
+        
+        XCTAssertNil(senderMock.batch)
+        XCTAssertNil(storageMock.batchRemovedId)
     }
     
     private func reinit() {
@@ -211,7 +140,8 @@ final class BatchSendControllerTests: XCTestCase {
             batchQueue: queueMock,
             batchStorage: storageMock,
             batchSender: senderMock,
-            timer: timerMock
+            timer: timerMock,
+            taskProvider: { [taskMock] _ in return taskMock! }
         )
     }
 }

@@ -6,15 +6,16 @@
 //
 
 import Foundation
+import PaltaCore
 import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
 final class BatchSenderMock: BatchSender {
     var batch: Batch?
-    var result: Result<(), BatchSendError>?
-    var completion: ((Result<(), BatchSendError>) -> Void)?
+    var result: Result<(), CategorisedNetworkError>?
+    var completion: ((Result<(), CategorisedNetworkError>) -> Void)?
     
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), BatchSendError>) -> Void) {
+    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
         self.batch = batch
         
         if let result = result {
@@ -24,7 +25,7 @@ final class BatchSenderMock: BatchSender {
         }
     }
     
-    func feedCompletion(_ result: Result<(), BatchSendError>) {
+    func feedCompletion(_ result: Result<(), CategorisedNetworkError>) {
         let completion = self.completion
         self.completion = nil
         completion?(result)

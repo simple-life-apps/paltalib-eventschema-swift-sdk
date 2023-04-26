@@ -94,7 +94,8 @@ extension EventQueueAssembly {
             batchQueue: batchQueue,
             batchStorage: sqliteStorage,
             batchSender: batchSender,
-            timer: TimerImpl()
+            timer: TimerImpl(),
+            taskProvider: { BatchSendTaskImpl(batch: $0) }
         )
         
         let eventToBatchQueueBridge = EventToBatchQueueBridge(
