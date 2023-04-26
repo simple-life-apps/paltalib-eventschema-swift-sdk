@@ -11,6 +11,7 @@ import PaltaCore
 struct BatchSendRequest {
     let host: URL?
     let time: Int
+    let errorCodes: [Int]
     let data: Data
 }
 
@@ -30,6 +31,7 @@ extension BatchSendRequest: AutobuildingHTTPRequest {
     var headers: [String : String]? {
         [
             "X-Client-Upload-TS": "\(time)",
+            "X-SDK-Network-Errors": errorCodes.map { "\($0)" }.joined(separator: ","),
             "Content-Type": "application/protobuf"
         ]
     }

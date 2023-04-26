@@ -16,6 +16,7 @@ final class BatchSendRequestTests: XCTestCase {
         let request = BatchSendRequest(
             host: URL(string: "ftp://mock.url")!,
             time: 878,
+            errorCodes: [1001, 5012, 2890],
             data: data
         )
         
@@ -28,7 +29,8 @@ final class BatchSendRequestTests: XCTestCase {
             [
                 "X-Client-Upload-TS": "878",
                 "DEFAULT_HEADER": "DEFAULT_HEADER_VALUE",
-                "Content-Type": "application/protobuf"
+                "Content-Type": "application/protobuf",
+                "X-SDK-Network-Errors": "1001,5012,2890"
             ]
         )
         XCTAssertEqual(urlRequest?.httpBody, data)

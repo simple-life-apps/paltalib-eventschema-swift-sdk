@@ -11,7 +11,7 @@ import PaltaCore
 import PaltaAnalyticsPrivateModel
 
 protocol BatchSender {
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void)
+    func sendBatch(_ batch: Batch, errorCodes: [Int], completion: @escaping (Result<(), CategorisedNetworkError>) -> Void)
 }
 
 final class BatchSenderImpl: BatchSender {
@@ -29,7 +29,7 @@ final class BatchSenderImpl: BatchSender {
         self.httpClient = httpClient
     }
     
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
+    func sendBatch(_ batch: Batch, errorCodes: [Int], completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
         let data: Data
         
         do {
@@ -42,6 +42,7 @@ final class BatchSenderImpl: BatchSender {
         let request = BatchSendRequest(
             host: baseURL,
             time: currentTimestamp(),
+            errorCodes: errorCodes,
             data: data
         )
         

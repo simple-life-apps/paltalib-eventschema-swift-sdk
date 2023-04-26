@@ -42,7 +42,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .success(EmptyResponse())
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: [505, 707]) { result in
             guard case .success = result else {
                 return
             }
@@ -55,6 +55,7 @@ final class BatchSenderTests: XCTestCase {
         XCTAssertNotNil(request)
         XCTAssertEqual(request?.time, 25)
         XCTAssertEqual(request?.host, url)
+        XCTAssertEqual(request?.errorCodes, [505, 707])
         XCTAssertEqual(request?.data, try batch.serialize())
         
         wait(for: [successCalled], timeout: 0.1)
@@ -66,7 +67,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .failure(NetworkErrorWithoutResponse.urlError(URLError(.notConnectedToInternet)))
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: []) { result in
             guard case .failure(let error) = result, case .noInternet = error else {
                 return
             }
@@ -83,7 +84,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .failure(NetworkErrorWithoutResponse.urlError(URLError(.timedOut)))
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: []) { result in
             guard case .failure(let error) = result, case .timeout = error else {
                 return
             }
@@ -100,7 +101,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .failure(NetworkErrorWithoutResponse.invalidStatusCode(502, nil))
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: []) { result in
             guard case .failure(let error) = result, case .serverError = error else {
                 return
             }
@@ -117,7 +118,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .failure(NetworkErrorWithoutResponse.invalidStatusCode(418, nil))
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: []) { result in
             guard case .failure(let error) = result, case .clientError(418) = error else {
                 return
             }
@@ -134,7 +135,7 @@ final class BatchSenderTests: XCTestCase {
         
         httpMock.result = .failure(NetworkErrorWithoutResponse.other(NSError(domain: "", code: 0)))
         
-        sender.sendBatch(batch) { result in
+        sender.sendBatch(batch, errorCodes: []) { result in
             guard case .failure(let error) = result, case .unknown = error else {
                 return
             }

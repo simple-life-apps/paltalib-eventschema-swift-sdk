@@ -12,11 +12,13 @@ import PaltaAnalyticsPrivateModel
 
 final class BatchSenderMock: BatchSender {
     var batch: Batch?
+    var errorCodes: [Int]?
     var result: Result<(), CategorisedNetworkError>?
     var completion: ((Result<(), CategorisedNetworkError>) -> Void)?
     
-    func sendBatch(_ batch: Batch, completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
+    func sendBatch(_ batch: Batch, errorCodes: [Int], completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
         self.batch = batch
+        self.errorCodes = errorCodes
         
         if let result = result {
             completion(result)

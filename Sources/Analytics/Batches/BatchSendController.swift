@@ -105,7 +105,7 @@ final class BatchSendController {
     }
     
     private func send(_ task: BatchSendTask) {
-        batchSender.sendBatch(task.batch) { [weak self] result in
+        batchSender.sendBatch(task.batch, errorCodes: []) { [weak self] result in
             switch result {
             case .success:
                 self?.completeBatchSend(task.batch)
