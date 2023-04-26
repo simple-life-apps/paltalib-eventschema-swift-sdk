@@ -26,6 +26,9 @@ final class SQLiteStorage {
         try client.executeStatement(
             "CREATE TABLE IF NOT EXISTS batches (batch_id BLOB PRIMARY KEY, batch_data BLOB);"
         )
+        try client.executeStatement(
+            "CREATE TABLE IF NOT EXISTS error_codes (batch_id BLOB, code INTEGER, id INTEGER PRIMARY KEY AUTOINCREMENT);"
+        )
     }
 }
 
@@ -62,7 +65,7 @@ extension SQLiteStorage: EventStorage {
             results = try client.executeStatement("SELECT event_id, event_data FROM events") { executor in
                 var results: [StorableEvent] = []
                 
-                while executor.runQuery(), let row = executor.getRow() {
+                while executor.runQuery(), let row = executor.getDataRow() {
                     do {
                         let event = try StorableEvent(data: row.column2)
                         results.append(event)
@@ -94,7 +97,7 @@ extension SQLiteStorage: BatchStorage {
         try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
             var results: [Batch] = []
             
-            while executor.runQuery(), let row = executor.getRow() {
+            while executor.runQuery(), let row = executor.getDataRow() {
                 do {
                     let batch = try Batch(data: row.column2)
                     results.append(batch)
@@ -128,6 +131,33 @@ extension SQLiteStorage: BatchStorage {
         try client.executeStatement("DELETE FROM batches WHERE batch_id = ?") { executor in
             executor.setValue(batch.batchId.data)
             try executor.runStep()
+        }
+        
+        try client.executeStatement("DELETE FROM error_codes WHERE batch_id = ?") { executor in
+            executor.setValue(batch.batchId.data)
+            try executor.runStep()
+        }
+    }
+    
+    func addErrorCode(_ errorCode: Int, for batch: Batch) throws {
+        let row = RowDataInteger(column1: batch.batchId.data, column2: errorCode)
+        try client.executeStatement("INSERT INTO error_codes (batch_id, code) VALUES (?, ?)") { executor in
+            executor.setRow(row)
+            try executor.runStep()
+        }
+    }
+    
+    func getErrorCodes(for batch: Batch) throws -> [Int] {
+        try client.executeStatement("SELECT batch_id, code FROM error_codes WHERE batch_id = ? ORDER BY id ASC") { executor in
+            executor.setValue(batch.batchId.data)
+            
+            var results: [Int] = []
+            
+            while executor.runQuery(), let row = executor.getIntRow() {
+                results.append(row.column2)
+            }
+            
+            return results
         }
     }
     

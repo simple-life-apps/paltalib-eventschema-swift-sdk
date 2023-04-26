@@ -243,6 +243,45 @@ final class SQLiteStorageTests: XCTestCase {
         XCTAssertEqual(Set(try storage.loadBatches()), [batch1, batch3])
     }
     
+    func testSaveErrors() throws {
+        let code1 = Int.random(in: 1000...10000)
+        let code2 = Int.random(in: 1000...10000)
+        let code3 = code2
+        
+        let batch: Batch = .mock()
+        
+        try storage.addErrorCode(code1, for: batch)
+        try storage.addErrorCode(code2, for: batch)
+        try storage.addErrorCode(code3, for: batch)
+        
+        try reinitStorage()
+        
+        let retrievedCodes = try storage.getErrorCodes(for: batch)
+        
+        XCTAssertEqual(retrievedCodes, [code1, code2, code3])
+    }
+    
+    func testGetNoErrors() throws {
+        XCTAssertEqual(try storage.getErrorCodes(for: .mock()), [])
+    }
+    
+    func testErrorCodesRemovedWithBatch() throws {
+        let batch: Batch = .mock()
+        
+        try storage.saveBatch(batch, with: [])
+        
+        try storage.addErrorCode(101, for: batch)
+        try storage.addErrorCode(102, for: batch)
+        
+        try reinitStorage()
+        
+        try storage.removeBatch(batch)
+        
+        try reinitStorage()
+        
+        XCTAssertEqual(try storage.getErrorCodes(for: batch), [])
+    }
+    
     private func reinitStorage() throws {
         storage = try SQLiteStorage(folderURL: testURL)
     }

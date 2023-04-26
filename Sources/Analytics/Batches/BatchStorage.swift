@@ -12,4 +12,7 @@ protocol BatchStorage {
     func loadBatches() throws -> [Batch]
     func saveBatch<IDS: Collection>(_ batch: Batch, with eventIds: IDS) throws where IDS.Element == UUID
     func removeBatch(_ batch: Batch) throws
+    
+    func addErrorCode(_ errorCode: Int, for batch: Batch) throws
+    func getErrorCodes(for batch: Batch) throws -> [Int]
 }

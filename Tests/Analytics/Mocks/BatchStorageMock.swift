@@ -17,6 +17,8 @@ final class BatchStorageMock: BatchStorage {
     var eventIds: Set<UUID> = []
     var batchRemoved = false
     var batchRemovedId: UUID?
+    var errorCodes: [Int] = []
+    var savedErrorCode: Int?
     
     func loadBatch() throws -> Batch? {
         if let batchLoadError = batchLoadError {
@@ -49,5 +51,13 @@ final class BatchStorageMock: BatchStorage {
     
     func removeBatch(_ batch: Batch) throws {
         batchRemovedId = batch.batchId
+    }
+    
+    func getErrorCodes(for batch: Batch) throws -> [Int] {
+        errorCodes
+    }
+    
+    func addErrorCode(_ errorCode: Int, for batch: Batch) throws {
+        savedErrorCode = errorCode
     }
 }
