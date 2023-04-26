@@ -66,6 +66,7 @@ final class EventQueueTests: XCTestCase {
     private var sentEvents: [UUID: BatchEvent]?
     private var contextId: UUID?
     private var telemetry: Telemetry?
+    private var triggerType: TriggerType?
     private var removedEvents: [StorableEvent]?
     
     private var sendResult = true
@@ -84,10 +85,11 @@ final class EventQueueTests: XCTestCase {
         _removeIsCalled = nil
         _removeIsntCalled = nil
 
-        queue.sendHandler = { [unowned self] events, contextId, telemetry in
+        queue.sendHandler = { [unowned self] events, contextId, telemetry, triggerType in
             sentEvents = events
             self.telemetry = telemetry
             self.contextId = contextId
+            self.triggerType = triggerType
             _sendIsCalled?.fulfill()
             _sendIsntCalled?.fulfill()
             
@@ -150,6 +152,7 @@ final class EventQueueTests: XCTestCase {
         XCTAssertEqual(telemetry?.batchLoad, 1 / 2)
         XCTAssertEqual(telemetry?.eventsInBatch, 1)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
+        XCTAssertEqual(triggerType, .timer)
     }
 
     func testTwoSequentalEvents() {
@@ -200,7 +203,8 @@ final class EventQueueTests: XCTestCase {
         wait(for: [sendIsCalled], timeout: 0.1)
 
         XCTAssertEqual(sentEvents?.count, 2)
-
+        XCTAssertEqual(triggerType, .count)
+        
         _sendIsCalled = nil
         timerMock.fire()
         wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
@@ -344,7 +348,6 @@ final class EventQueueTests: XCTestCase {
         queue.addEvents(events)
         
         wait(for: [sendIsCalled], timeout: 0.1)
-        
         XCTAssertEqual(contextId, contextId1)
         XCTAssertEqual(
             Set(sentEvents?.values.map { $0 } ?? []),
@@ -497,6 +500,7 @@ final class EventQueueTests: XCTestCase {
         
         wait(for: [sendIsCalled], timeout: 0.15)
         
+        XCTAssertEqual(triggerType, .context)
         XCTAssertEqual(contextId, contextId1)
         XCTAssertEqual(
             Set(sentEvents?.values.map { $0 } ?? []),
@@ -524,6 +528,7 @@ final class EventQueueTests: XCTestCase {
         wait(for: [sendIsCalled], timeout: 0.15)
         
         XCTAssertEqual(sentEvents?.count, 2)
+        XCTAssertEqual(triggerType, .minimise)
     }
     
     private func warmUpExpectations(_ expectations: XCTestExpectation...) {

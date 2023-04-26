@@ -17,7 +17,7 @@ struct EventQueueConfig {
 }
 
 protocol EventQueue: AnyObject {
-    typealias UploadHandler = ([UUID: BatchEvent], UUID, Telemetry) -> Bool
+    typealias UploadHandler = ([UUID: BatchEvent], UUID, Telemetry, TriggerType) -> Bool
     typealias RemoveHandler = (ArraySlice<StorableEvent>) -> Void
 
     var sendHandler: UploadHandler? { get set }
@@ -78,7 +78,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
     func sendEventsAvailable() {
         workingQueue.async { [self] in
             if timerFired {
-                flush()
+                flush(.timer)
             } else {
                 flushByCountOrContexts()
             }
@@ -93,7 +93,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
     
     func forceFlush() {
         workingQueue.async { [self] in
-            flush()
+            flush(.minimise)
         }
     }
     
@@ -137,7 +137,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
         timerToken = timer.scheduleTimer(timeInterval: config.uploadInterval, on: workingQueue) { [weak self] in
             self?.timerFired = true
             self?.timerToken = nil
-            self?.flush()
+            self?.flush(.timer)
         }
     }
 
@@ -146,7 +146,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
             return false
         }
 
-        flush()
+        flush(.count)
         return true
     }
     
@@ -159,7 +159,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
             return false
         }
         
-        flush()
+        flush(.context)
         return true
     }
     
@@ -173,7 +173,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
         _ = flushIfMultipleContexts()
     }
 
-    private func flush() {
+    private func flush(_ triggerType: TriggerType) {
         let timerWasFired = timerFired
         timerFired = false
 
@@ -199,7 +199,7 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
 
         let batchEvents = Dictionary(grouping: events[range], by: { $0.event.id })
             .compactMapValues { $0.first?.event.event }
-        let batchFormed = sendHandler?(batchEvents, contextId, telemetry) ?? false
+        let batchFormed = sendHandler?(batchEvents, contextId, telemetry, triggerType) ?? false
         
         guard batchFormed else {
             timerFired = timerWasFired

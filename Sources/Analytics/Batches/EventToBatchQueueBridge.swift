@@ -29,7 +29,7 @@ final class EventToBatchQueueBridge {
     }
     
     private func setup() {
-        eventQueue.sendHandler = { [weak self] events, contextId, _ in
+        eventQueue.sendHandler = { [weak self] events, contextId, _, _ in
             self?.onFlush(events: events, contextId: contextId)
             return true
         }

@@ -58,7 +58,7 @@ final class EventToBatchQueueBridgeTests: XCTestCase {
         
         let contextId = UUID()
         
-        XCTAssertEqual(eventQueueMock.sendHandler?(events, contextId, .mock()), true)
+        XCTAssertEqual(eventQueueMock.sendHandler?(events, contextId, .mock(), .context), true)
         
         XCTAssertEqual(batchComposerMock.contextId, contextId)
         XCTAssertEqual(Set(batchComposerMock.events ?? []), Set(events.values))
