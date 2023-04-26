@@ -12,10 +12,12 @@ import PaltaAnalyticsPrivateModel
 final class BatchComposerMock: BatchComposer {
     var events: [BatchEvent]?
     var contextId: UUID?
+    var triggerType: TriggerType?
     
-    func makeBatch(of events: [BatchEvent], with contextId: UUID) -> Batch {
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) -> Batch {
         self.events = events
         self.contextId = contextId
+        self.triggerType = triggerType
         
         return Batch()
     }

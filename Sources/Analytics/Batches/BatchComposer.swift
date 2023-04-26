@@ -9,7 +9,7 @@ import Foundation
 import PaltaAnalyticsPrivateModel
 
 protocol BatchComposer {
-    func makeBatch(of events: [BatchEvent], with contextId: UUID) throws -> Batch
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) throws -> Batch
 }
 
 final class BatchComposerImpl: BatchComposer {
@@ -30,7 +30,7 @@ final class BatchComposerImpl: BatchComposer {
         self.deviceInfoProvider = deviceInfoProvider
     }
     
-    func makeBatch(of events: [BatchEvent], with contextId: UUID) throws -> Batch {
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) throws -> Batch {
         let common = BatchCommon(
             instanceId: userInfoProvider.instanceId,
             batchId: uuidGenerator.generateUUID(),
@@ -41,11 +41,13 @@ final class BatchComposerImpl: BatchComposer {
         
         let sortedEvents = events.sorted(by: { $0.timestamp < $1.timestamp })
         
-        let batch = try Batch(
+        var batch = try Batch(
             common: common,
             context: contextProvider.context(with: contextId).serialize(),
             events: sortedEvents
         )
+        
+        batch.telemetry.triggerType = triggerType.rawValue
         
         return batch
     }

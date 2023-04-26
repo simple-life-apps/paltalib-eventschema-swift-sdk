@@ -48,7 +48,7 @@ final class EventToBatchQueueBridge {
     
     private func onFlush(events: [UUID: BatchEvent], contextId: UUID) {
         do {
-            let batch = try batchComposer.makeBatch(of: Array(events.values), with: contextId)
+            let batch = try batchComposer.makeBatch(of: Array(events.values), with: contextId, triggerType: .minimise)
             try batchStorage.saveBatch(batch, with: events.keys)
             batchQueue.addBatch(batch)
         } catch {
