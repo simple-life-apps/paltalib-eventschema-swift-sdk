@@ -60,6 +60,7 @@ extension EventQueueAssembly {
         // Telemetry
         
         let storeErrorsLogger = ErrorsCollectorImpl(lock: lock)
+        let serializationErrorsLogger = ErrorsCollectorImpl(lock: lock)
         
         // Core
         
@@ -122,7 +123,8 @@ extension EventQueueAssembly {
             eventComposer: eventComposer,
             sessionManager: analyticsCoreAssembly.sessionManager,
             contextProvider: currentContextManager,
-            backgroundNotifier: BackgroundNotifierImpl(notificationCenter: .default)
+            backgroundNotifier: BackgroundNotifierImpl(notificationCenter: .default),
+            errorLogger: serializationErrorsLogger
         )
         
         self.init(
