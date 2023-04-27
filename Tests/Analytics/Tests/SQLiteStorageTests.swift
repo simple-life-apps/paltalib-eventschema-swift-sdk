@@ -11,6 +11,7 @@ import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
 final class SQLiteStorageTests: XCTestCase {
+    private var errorLoggerMock: ErrorsCollectorMock!
     private var fileManager: FileManager!
     private var testURL: URL!
     
@@ -19,6 +20,7 @@ final class SQLiteStorageTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         
+        errorLoggerMock = .init()
         fileManager = FileManager()
         testURL = fileManager.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         
@@ -283,6 +285,6 @@ final class SQLiteStorageTests: XCTestCase {
     }
     
     private func reinitStorage() throws {
-        storage = try SQLiteStorage(folderURL: testURL)
+        storage = try SQLiteStorage(errorsLogger: errorLoggerMock, folderURL: testURL)
     }
 }

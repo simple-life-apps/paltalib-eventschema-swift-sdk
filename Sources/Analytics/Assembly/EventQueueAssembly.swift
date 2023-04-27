@@ -53,6 +53,14 @@ extension EventQueueAssembly {
             try! FileManager.default.createDirectory(at: workingUrl, withIntermediateDirectories: true)
         }
         
+        // Common
+        
+        let lock = NSRecursiveLock()
+        
+        // Telemetry
+        
+        let storeErrorsLogger = ErrorsCollectorImpl(lock: lock)
+        
         // Core
         
         let core = EventQueueImpl(timer: TimerImpl())
@@ -69,7 +77,7 @@ extension EventQueueAssembly {
             fileManager: .default
         )
         
-        let sqliteStorage = try SQLiteStorage(folderURL: workingUrl)
+        let sqliteStorage = try SQLiteStorage(errorsLogger: storeErrorsLogger, folderURL: workingUrl)
         
         // Context
         

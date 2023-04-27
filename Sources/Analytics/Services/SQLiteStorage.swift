@@ -11,9 +11,11 @@ import PaltaCore
 import PaltaAnalyticsPrivateModel
 
 final class SQLiteStorage {
+    private let errorsLogger: ErrorsCollector
     private let client: SQLiteClient
     
-    init(folderURL: URL) throws {
+    init(errorsLogger: ErrorsCollector, folderURL: URL) throws {
+        self.errorsLogger = errorsLogger
         self.client = try SQLiteClient(databaseURL: folderURL.appendingPathComponent("dbv3.sqlite"))
         
         try populateTables()
@@ -47,6 +49,7 @@ extension SQLiteStorage: EventStorage {
             }
         } catch {
             print("PaltaLib: Analytics: Error saving event: \(error)")
+            errorsLogger.logError("Store event: \(error.localizedDescription)")
         }
     }
     
@@ -55,6 +58,7 @@ extension SQLiteStorage: EventStorage {
             try doRemoveEvent(with: id)
         } catch {
             print("PaltaLib: Analytics: Error removing event: \(error)")
+            errorsLogger.logError("Remove event: \(error.localizedDescription)")
         }
     }
     
@@ -71,6 +75,7 @@ extension SQLiteStorage: EventStorage {
                         results.append(event)
                     } catch {
                         print("PaltaLib: Analytics: Error loading single event: \(error)")
+                        errorsLogger.logError("Get event: \(error.localizedDescription)")
                     }
                 }
                 
@@ -79,6 +84,7 @@ extension SQLiteStorage: EventStorage {
         } catch {
             results = []
             print("PaltaLib: Analytics: Error loading events: \(error)")
+            errorsLogger.logError("Get events: \(error.localizedDescription)")
         }
                 
         completion(results)
@@ -94,19 +100,25 @@ extension SQLiteStorage: EventStorage {
 
 extension SQLiteStorage: BatchStorage {
     func loadBatches() throws -> [PaltaAnalyticsPrivateModel.Batch] {
-        try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
-            var results: [Batch] = []
-            
-            while executor.runQuery(), let row = executor.getDataRow() {
-                do {
-                    let batch = try Batch(data: row.column2)
-                    results.append(batch)
-                } catch {
-                    print("PaltaLib: Analytics: Error loading single batch: \(error)")
+        do {
+            return try client.executeStatement("SELECT batch_id, batch_data FROM batches") { executor in
+                var results: [Batch] = []
+                
+                while executor.runQuery(), let row = executor.getDataRow() {
+                    do {
+                        let batch = try Batch(data: row.column2)
+                        results.append(batch)
+                    } catch {
+                        print("PaltaLib: Analytics: Error loading single batch: \(error)")
+                        errorsLogger.logError("Load single batch: \(error.localizedDescription)")
+                    }
                 }
+                
+                return results
             }
-            
-            return results
+        } catch {
+            errorsLogger.logError("Load batches: \(error.localizedDescription)")
+            throw error
         }
     }
     
@@ -122,43 +134,62 @@ extension SQLiteStorage: BatchStorage {
             
             try client.executeStatement("COMMIT TRANSACTION")
         } catch {
+            errorsLogger.logError("Save batch: \(error.localizedDescription)")
             try client.executeStatement("ROLLBACK TRANSACTION")
             throw error
         }
     }
     
     func removeBatch(_ batch: Batch) throws {
-        try client.executeStatement("DELETE FROM batches WHERE batch_id = ?") { executor in
-            executor.setValue(batch.batchId.data)
-            try executor.runStep()
-        }
-        
-        try client.executeStatement("DELETE FROM error_codes WHERE batch_id = ?") { executor in
-            executor.setValue(batch.batchId.data)
-            try executor.runStep()
+        do {
+            try client.executeStatement("DELETE FROM batches WHERE batch_id = ?") { executor in
+                executor.setValue(batch.batchId.data)
+                try executor.runStep()
+            }
+            
+            try client.executeStatement("DELETE FROM error_codes WHERE batch_id = ?") { executor in
+                executor.setValue(batch.batchId.data)
+                try executor.runStep()
+            }
+        } catch {
+            errorsLogger.logError("Remove batch: \(error.localizedDescription)")
+            throw error
         }
     }
     
     func addErrorCode(_ errorCode: Int, for batch: Batch) throws {
-        let row = RowDataInteger(column1: batch.batchId.data, column2: errorCode)
-        try client.executeStatement("INSERT INTO error_codes (batch_id, code) VALUES (?, ?)") { executor in
-            executor.setRow(row)
-            try executor.runStep()
+        do {
+            let row = RowDataInteger(column1: batch.batchId.data, column2: errorCode)
+            try client.executeStatement("INSERT INTO error_codes (batch_id, code) VALUES (?, ?)") { executor in
+                executor.setRow(row)
+                try executor.runStep()
+            }
+        } catch {
+            errorsLogger.logError("Add error code: \(error.localizedDescription)")
+            throw error
         }
     }
     
     func getErrorCodes(for batch: Batch) throws -> [Int] {
-        try client.executeStatement("SELECT batch_id, code FROM error_codes WHERE batch_id = ? ORDER BY id ASC") { executor in
-            executor.setValue(batch.batchId.data)
-            
-            var results: [Int] = []
-            
-            while executor.runQuery(), let row = executor.getIntRow() {
-                results.append(row.column2)
+        do {
+            return try client.executeStatement(
+                "SELECT batch_id, code FROM error_codes WHERE batch_id = ? ORDER BY id ASC"
+            ) { executor in
+                executor.setValue(batch.batchId.data)
+                
+                var results: [Int] = []
+                
+                while executor.runQuery(), let row = executor.getIntRow() {
+                    results.append(row.column2)
+                }
+                
+                return results
             }
-            
-            return results
+        } catch {
+            errorsLogger.logError("Get error codes: \(error.localizedDescription)")
+            throw error
         }
+        
     }
     
     private func doSaveBatch(_ batch: Batch) throws {
