@@ -192,9 +192,10 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
         let range = 0..<min(batchSize, events.count, firstIndexWithAnotherContext)
 
         let telemetry = Telemetry(
-            eventsInBatch: range.count,
-            batchLoad: Double(range.count) / Double(batchSize),
-            eventsDroppedSinceLastBatch: droppedEventsCount
+            eventsDroppedSinceLastBatch: droppedEventsCount,
+            reportingSpeed: 0,
+            storageErrors: [],
+            serializationErrors: []
         )
 
         let batchEvents = Dictionary(grouping: events[range], by: { $0.event.id })

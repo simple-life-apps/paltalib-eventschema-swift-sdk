@@ -149,8 +149,6 @@ final class EventQueueTests: XCTestCase {
         wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
 
         XCTAssertEqual(sentEvents?.count, 1)
-        XCTAssertEqual(telemetry?.batchLoad, 1 / 2)
-        XCTAssertEqual(telemetry?.eventsInBatch, 1)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
         XCTAssertEqual(triggerType, .timer)
     }
@@ -181,8 +179,6 @@ final class EventQueueTests: XCTestCase {
         wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
 
         XCTAssertEqual(sentEvents?.count, 2)
-        XCTAssertEqual(telemetry?.batchLoad, 2 / 3)
-        XCTAssertEqual(telemetry?.eventsInBatch, 2)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
     }
 
@@ -231,8 +227,6 @@ final class EventQueueTests: XCTestCase {
         wait(for: [sendIsCalled], timeout: 0.1)
 
         XCTAssertEqual(sentEvents?.count, 3)
-        XCTAssertEqual(telemetry?.batchLoad, 1)
-        XCTAssertEqual(telemetry?.eventsInBatch, 3)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
     }
 
@@ -320,8 +314,6 @@ final class EventQueueTests: XCTestCase {
 
         wait(for: [sendIsCalled], timeout: 0.1)
 
-        XCTAssertEqual(telemetry?.batchLoad, 5 / 300)
-        XCTAssertEqual(telemetry?.eventsInBatch, 5)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 5)
     }
     

@@ -10,6 +10,6 @@ import Foundation
 
 extension Telemetry {
     static func mock() -> Telemetry {
-        .init(eventsInBatch: 55, batchLoad: 0.8, eventsDroppedSinceLastBatch: 78)
+        .init(eventsDroppedSinceLastBatch: 55, reportingSpeed: 0.2, storageErrors: [], serializationErrors: [])
     }
 }

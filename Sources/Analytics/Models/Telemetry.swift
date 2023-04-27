@@ -8,7 +8,8 @@
 import Foundation
 
 struct Telemetry: Encodable, Equatable {
-    let eventsInBatch: Int
-    let batchLoad: Double
     let eventsDroppedSinceLastBatch: Int
+    let reportingSpeed: Double
+    let storageErrors: [String]
+    let serializationErrors: [String]
 }
