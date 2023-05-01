@@ -15,3 +15,11 @@ final class ErrorsCollectorMock: ErrorsCollector {
         errorsLogged.append(message)
     }
 }
+
+final class ErrorsProviderMock: ErrorsProvider {
+    var errors: [String] = []
+    
+    func getErrors() -> [String] {
+        errors
+    }
+}

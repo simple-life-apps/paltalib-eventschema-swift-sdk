@@ -64,7 +64,12 @@ extension EventQueueAssembly {
         
         // Core
         
-        let core = EventQueueImpl(timer: TimerImpl())
+        let core = EventQueueImpl(
+            serializationErrorsProvider: serializationErrorsLogger,
+            storageErrorsProvider: storeErrorsLogger,
+            timer: TimerImpl(),
+            lock: lock
+        )
         
         let eventComposer = EventComposerImpl(
             sessionProvider: analyticsCoreAssembly.sessionManager

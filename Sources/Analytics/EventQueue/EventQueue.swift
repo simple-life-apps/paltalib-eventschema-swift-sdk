@@ -55,10 +55,21 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
     }
 
     private let workingQueue = DispatchQueue(label: "com.paltabrain.analytics.eventQueueCore")
+    private let serializationErrorsProvider: ErrorsProvider
+    private let storageErrorsProvider: ErrorsProvider
     private let timer: PaltaTimer
+    private let lock: NSLocking
 
-    init(timer: PaltaTimer) {
+    init(
+        serializationErrorsProvider: ErrorsProvider,
+        storageErrorsProvider: ErrorsProvider,
+        timer: PaltaTimer,
+        lock: NSLocking
+    ) {
+        self.serializationErrorsProvider = serializationErrorsProvider
+        self.storageErrorsProvider = storageErrorsProvider
         self.timer = timer
+        self.lock = lock
     }
 
     func addEvent(_ event: StorableEvent) {
@@ -174,6 +185,9 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
     }
 
     private func flush(_ triggerType: TriggerType) {
+        lock.lock()
+        defer { lock.unlock() }
+
         let timerWasFired = timerFired
         timerFired = false
 
@@ -194,8 +208,8 @@ final class EventQueueImpl: EventQueue, FunctionalExtension {
         let telemetry = Telemetry(
             eventsDroppedSinceLastBatch: droppedEventsCount,
             reportingSpeed: 0,
-            storageErrors: [],
-            serializationErrors: []
+            storageErrors: storageErrorsProvider.getErrors(),
+            serializationErrors: serializationErrorsProvider.getErrors()
         )
 
         let batchEvents = Dictionary(grouping: events[range], by: { $0.event.id })

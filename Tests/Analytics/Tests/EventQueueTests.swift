@@ -12,6 +12,9 @@ import PaltaAnalyticsPrivateModel
 @testable import PaltaAnalytics
 
 final class EventQueueTests: XCTestCase {
+    private var storeErrorsMock: ErrorsProviderMock!
+    private var serializationErrorsMock: ErrorsProviderMock!
+    private var lock: NSLock!
     private var timerMock: TimerMock!
     private var queue: EventQueueImpl!
 
@@ -75,7 +78,17 @@ final class EventQueueTests: XCTestCase {
         try super.setUpWithError()
 
         timerMock = TimerMock()
-        queue = EventQueueImpl(timer: timerMock)
+        storeErrorsMock = .init()
+        serializationErrorsMock = .init()
+        lock = .init()
+        
+        queue = EventQueueImpl(
+            serializationErrorsProvider: serializationErrorsMock,
+            storageErrorsProvider: storeErrorsMock,
+            timer: timerMock,
+            lock: lock
+        )
+        
         sentEvents = nil
         removedEvents = nil
         sendResult = true
@@ -521,6 +534,56 @@ final class EventQueueTests: XCTestCase {
         
         XCTAssertEqual(sentEvents?.count, 2)
         XCTAssertEqual(triggerType, .minimise)
+    }
+    
+    func testErrorsReported() {
+        let serErrors = [UUID().uuidString, UUID().uuidString, String(Array(repeating: "D", count: 100_000))]
+        let storeErrors = [UUID().uuidString, UUID().uuidString, String(Array(repeating: "A", count: 100_000))]
+        
+        serializationErrorsMock.errors = serErrors
+        storeErrorsMock.errors = storeErrors
+        
+        let contextId = UUID()
+        
+        let events: [StorableEvent] = [
+            .mock(timestamp: 0, contextId: contextId),
+            .mock(timestamp: 1, contextId: contextId)
+        ]
+        
+        queue.apply(
+            .init(maxBatchSize: 200, uploadInterval: 100, uploadThreshold: 200, maxEvents: 100)
+        )
+        waitForQueue()
+        
+        queue.addEvents(events)
+        
+        queue.forceFlush()
+        
+        wait(for: [sendIsCalled], timeout: 0.15)
+        
+        XCTAssertEqual(telemetry?.serializationErrors, serErrors)
+        XCTAssertEqual(telemetry?.storageErrors, storeErrors)
+    }
+    
+    func testLockUsed() {
+        lock.lock()
+        
+        let events: [StorableEvent] = [.mock(timestamp: 0, contextId: UUID())]
+        
+        queue.apply(
+            .init(maxBatchSize: 200, uploadInterval: 100, uploadThreshold: 200, maxEvents: 100)
+        )
+        waitForQueue()
+        
+        queue.addEvents(events)
+        
+        queue.forceFlush()
+        
+        wait(for: [sendIsntCalled], timeout: 0.15)
+        
+        lock.unlock()
+        
+        wait(for: [sendIsCalled], timeout: 0.15)
     }
     
     private func warmUpExpectations(_ expectations: XCTestExpectation...) {
