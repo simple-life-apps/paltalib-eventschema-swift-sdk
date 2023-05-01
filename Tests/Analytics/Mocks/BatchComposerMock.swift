@@ -13,11 +13,13 @@ final class BatchComposerMock: BatchComposer {
     var events: [BatchEvent]?
     var contextId: UUID?
     var triggerType: TriggerType?
+    var telemetry: Telemetry?
     
-    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) -> Batch {
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType, telemetry: Telemetry) -> Batch {
         self.events = events
         self.contextId = contextId
         self.triggerType = triggerType
+        self.telemetry = telemetry
         
         return Batch()
     }

@@ -9,10 +9,16 @@ import Foundation
 import PaltaAnalyticsPrivateModel
 
 protocol BatchComposer {
-    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) throws -> Batch
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType, telemetry: Telemetry) throws -> Batch
 }
 
 final class BatchComposerImpl: BatchComposer {
+    private let numberFormatter = NumberFormatter().do {
+        $0.maximumFractionDigits = 2000
+        $0.maximumSignificantDigits = 2000
+        $0.numberStyle = .decimal
+    }
+    
     private let uuidGenerator: UUIDGenerator
     private let contextProvider: ContextProvider
     private let userInfoProvider: UserPropertiesProvider
@@ -30,7 +36,7 @@ final class BatchComposerImpl: BatchComposer {
         self.deviceInfoProvider = deviceInfoProvider
     }
     
-    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType) throws -> Batch {
+    func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType, telemetry: Telemetry) throws -> Batch {
         let common = BatchCommon(
             instanceId: userInfoProvider.instanceId,
             batchId: uuidGenerator.generateUUID(),
@@ -48,6 +54,10 @@ final class BatchComposerImpl: BatchComposer {
         )
         
         batch.telemetry.triggerType = triggerType.rawValue
+        batch.telemetry.storageErrors = telemetry.storageErrors
+        batch.telemetry.serializationErrors = telemetry.serializationErrors
+        batch.telemetry.eventsDropped = Int64(telemetry.eventsDroppedSinceLastBatch)
+        batch.telemetry.eventsReportingSpeed = numberFormatter.string(from: telemetry.reportingSpeed as NSNumber) ?? ""
         
         return batch
     }

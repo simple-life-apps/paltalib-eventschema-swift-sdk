@@ -76,6 +76,13 @@ final class EventToBatchQueueBridgeTests: XCTestCase {
         }
     }
     
+    func testTelemetryPassing() {
+        let telemetry = Telemetry.randomMock()
+        _ = eventQueueMock.sendHandler?([UUID(): .mock()], UUID(), telemetry, .context)
+        
+        XCTAssertEqual(batchComposerMock.telemetry, telemetry)
+    }
+    
     private func reinitBridge() {
         bridge = EventToBatchQueueBridge(
             eventQueue: eventQueueMock,

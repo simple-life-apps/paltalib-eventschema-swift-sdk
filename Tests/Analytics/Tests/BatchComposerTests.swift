@@ -47,7 +47,7 @@ final class BatchComposerTests: XCTestCase {
         deviceInfoProvider.timezoneOffsetSeconds = 898
         uuidGenerator.uuids = [batchId]
         
-        let batch = try composer.makeBatch(of: events, with: contextId, triggerType: .minimise)
+        let batch = try composer.makeBatch(of: events, with: contextId, triggerType: .minimise, telemetry: .mock())
         
         XCTAssertEqual(batch.context, try context.serialize())
         XCTAssertEqual(batch.events, events)
@@ -73,7 +73,7 @@ final class BatchComposerTests: XCTestCase {
         contextProvider.context = context
         uuidGenerator.uuids = [UUID()]
         
-        let batch = try composer.makeBatch(of: events, with: contextId, triggerType: .count)
+        let batch = try composer.makeBatch(of: events, with: contextId, triggerType: .count, telemetry: .mock())
         
         XCTAssertEqual(
             batch.events.map { $0.timestamp },
@@ -86,23 +86,45 @@ final class BatchComposerTests: XCTestCase {
         contextProvider.context = BatchContextMock()
 
         try XCTAssertEqual(
-            composer.makeBatch(of: [], with: UUID(), triggerType: .count).telemetry.triggerType,
+            composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock()).telemetry.triggerType,
             "count"
         )
         
         try XCTAssertEqual(
-            composer.makeBatch(of: [], with: UUID(), triggerType: .timer).telemetry.triggerType,
+            composer.makeBatch(of: [], with: UUID(), triggerType: .timer, telemetry: .mock()).telemetry.triggerType,
             "timer"
         )
         
         try XCTAssertEqual(
-            composer.makeBatch(of: [], with: UUID(), triggerType: .context).telemetry.triggerType,
+            composer.makeBatch(of: [], with: UUID(), triggerType: .context, telemetry: .mock()).telemetry.triggerType,
             "context"
         )
         
         try XCTAssertEqual(
-            composer.makeBatch(of: [], with: UUID(), triggerType: .minimise).telemetry.triggerType,
+            composer.makeBatch(of: [], with: UUID(), triggerType: .minimise, telemetry: .mock()).telemetry.triggerType,
             "minimise"
         )
+    }
+    
+    func testTelemetryPassed() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        
+        let storeErrors = [UUID().uuidString, UUID().uuidString, String(Array(repeating: "C", count: 100_000))]
+        let serErrors = [UUID().uuidString, UUID().uuidString, String(Array(repeating: "C", count: 100_000))]
+        
+        let telemetry = Telemetry(
+            eventsDroppedSinceLastBatch: 558,
+            reportingSpeed: 0.0000000000000000000098,
+            storageErrors: storeErrors,
+            serializationErrors: serErrors
+        )
+        
+        let batch = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: telemetry)
+        
+        XCTAssertEqual(batch.telemetry.storageErrors, storeErrors)
+        XCTAssertEqual(batch.telemetry.serializationErrors, serErrors)
+        XCTAssertEqual(batch.telemetry.eventsDropped, 558)
+        XCTAssertEqual(batch.telemetry.eventsReportingSpeed, "0.0000000000000000000098")
     }
 }
