@@ -16,6 +16,7 @@ final class BatchComposerTests: XCTestCase {
     private var userInfoProvider: UserPropertiesKeeperMock!
     private var deviceInfoProvider: DeviceInfoProviderMock!
     private var networkInfoProvider: NetworkInfoProviderMock!
+    private var storageSpaceProvider: StorageSpaceProviderMock!
     
     private var composer: BatchComposerImpl!
     
@@ -27,13 +28,15 @@ final class BatchComposerTests: XCTestCase {
         userInfoProvider = .init()
         deviceInfoProvider = .init()
         networkInfoProvider = .init()
+        storageSpaceProvider = .init()
         
         composer = BatchComposerImpl(
             uuidGenerator: uuidGenerator,
             contextProvider: contextProvider,
             userInfoProvider: userInfoProvider,
             deviceInfoProvider: deviceInfoProvider,
-            networkInfoProvider: networkInfoProvider
+            networkInfoProvider: networkInfoProvider,
+            storageSpaceProvider: storageSpaceProvider
         )
     }
     
@@ -170,5 +173,25 @@ final class BatchComposerTests: XCTestCase {
         let batch3 = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
         
         XCTAssertEqual(batch3.telemetry.timeSinceLastBatch, 350)
+    }
+    
+    func testStorageSpaceThrows() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        storageSpaceProvider.error = NSError(domain: "fff", code: 505)
+        
+        let batch = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertFalse(batch.telemetry.hasStorageUsed)
+    }
+    
+    func testStorageSpacePassed() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        storageSpaceProvider.result = 1000.000000000589
+        
+        let batch = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertEqual(batch.telemetry.storageUsed, "1000.000000000589")
     }
 }

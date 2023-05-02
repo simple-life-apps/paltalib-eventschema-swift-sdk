@@ -97,7 +97,8 @@ extension EventQueueAssembly {
             contextProvider: contextStorage,
             userInfoProvider: analyticsCoreAssembly.userPropertiesKeeper,
             deviceInfoProvider: analyticsCoreAssembly.deviceInfoProvider,
-            networkInfoProvider: networkInfoLogger
+            networkInfoProvider: networkInfoLogger,
+            storageSpaceProvider: StorageSpaceProviderImpl(folderURL: workingUrl, fileManager: .default)
         )
         
         let batchSender = BatchSenderImpl(
