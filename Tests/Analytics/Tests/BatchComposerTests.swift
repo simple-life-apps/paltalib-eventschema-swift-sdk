@@ -151,4 +151,24 @@ final class BatchComposerTests: XCTestCase {
         XCTAssertFalse(batch.telemetry.hasPrevRequestTime)
         XCTAssertFalse(batch.telemetry.hasPrevConnectionSpeed)
     }
+    
+    func testTimeSinceLastBatch() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        
+        mockedTimestamp = 100
+        let batch1 = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertFalse(batch1.telemetry.hasTimeSinceLastBatch)
+        
+        mockedTimestamp = 500
+        let batch2 = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertEqual(batch2.telemetry.timeSinceLastBatch, 400)
+        
+        mockedTimestamp = 850
+        let batch3 = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertEqual(batch3.telemetry.timeSinceLastBatch, 350)
+    }
 }

@@ -13,6 +13,8 @@ protocol BatchComposer {
 }
 
 final class BatchComposerImpl: BatchComposer {
+    private var lastBatchFormed: Int?
+    
     private let numberFormatter = NumberFormatter().do {
         $0.maximumFractionDigits = 2000
         $0.maximumSignificantDigits = 2000
@@ -67,6 +69,12 @@ final class BatchComposerImpl: BatchComposer {
             batch.telemetry.prevConnectionSpeed = numberFormatter.string(from: networkInfo.speed as NSNumber) ?? ""
             batch.telemetry.prevRequestTime = Int64(networkInfo.time)
         }
+        
+        if let lastBatchFormed = lastBatchFormed {
+            batch.telemetry.timeSinceLastBatch = Int64(currentTimestamp() - lastBatchFormed)
+        }
+        
+        lastBatchFormed = currentTimestamp()
         
         return batch
     }
