@@ -24,9 +24,11 @@ final class BatchSenderImpl: BatchSender {
     var baseURL: URL?
     
     private let httpClient: HTTPClient
+    private let networkInfoLogger: NetworkInfoLogger
     
-    init(httpClient: HTTPClient) {
+    init(httpClient: HTTPClient, networkInfoLogger: NetworkInfoLogger) {
         self.httpClient = httpClient
+        self.networkInfoLogger = networkInfoLogger
     }
     
     func sendBatch(_ batch: Batch, errorCodes: [Int], completion: @escaping (Result<(), CategorisedNetworkError>) -> Void) {
@@ -47,8 +49,13 @@ final class BatchSenderImpl: BatchSender {
         )
         
         let errorHandler = ErrorHandler(completion: completion)
+        var trace: NetworkTrace?
         
-        httpClient.perform(request) { (result: Result<EmptyResponse, NetworkErrorWithoutResponse>) in
+        httpClient.perform(
+            request,
+            requestMiddleware: { [networkInfoLogger] in trace = networkInfoLogger.newTrace(for: $0) },
+            responseMiddleware: { _, data in trace?.finish(with: data) }
+        ) { (result: Result<EmptyResponse, NetworkErrorWithoutResponse>) in
             switch result {
             case .success:
                 completion(.success(()))

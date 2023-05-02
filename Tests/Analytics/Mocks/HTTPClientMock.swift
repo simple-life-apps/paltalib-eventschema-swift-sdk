@@ -10,6 +10,9 @@ import PaltaCore
 
 final class HTTPClientMock: HTTPClient {
     var request: HTTPRequest?
+    
+    var urlRequest: URLRequest?
+    var response: (HTTPURLResponse?, Data?)?
     var result: Result<Any, Error>?
     
     var mandatoryHeaders: [String : String] = [:]
@@ -18,7 +21,24 @@ final class HTTPClientMock: HTTPClient {
         _ request: HTTPRequest,
         with completion: @escaping (Result<SuccessResponse, NetworkErrorWithResponse<ErrorResponse>>) -> Void
     ) {
+        perform(request, requestMiddleware: { _ in }, responseMiddleware: { _, _ in }, with: completion)
+    }
+    
+    func perform<SuccessResponse: Decodable, ErrorResponse: Decodable>(
+        _ request: HTTPRequest,
+        requestMiddleware: @escaping (URLRequest) -> Void,
+        responseMiddleware: @escaping (HTTPURLResponse?, Data?) -> Void,
+        with completion: @escaping (Result<SuccessResponse, NetworkErrorWithResponse<ErrorResponse>>) -> Void
+    ) {
         self.request = request
+        
+        if let urlRequest = urlRequest {
+            requestMiddleware(urlRequest)
+        }
+        
+        if let response = response {
+            responseMiddleware(response.0, response.1)
+        }
 
         completion(
             result?
@@ -26,8 +46,5 @@ final class HTTPClientMock: HTTPClient {
                 .mapError { $0 as! NetworkErrorWithResponse<ErrorResponse> }
             ?? .failure(.noData)
         )
-    }
-
-    func perform<T>(_ request: HTTPRequest, with completion: @escaping (Result<T, Error>) -> Void) where T : Decodable {
     }
 }

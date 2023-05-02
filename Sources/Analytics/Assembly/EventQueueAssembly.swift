@@ -61,6 +61,7 @@ extension EventQueueAssembly {
         
         let storeErrorsLogger = ErrorsCollectorImpl(lock: lock)
         let serializationErrorsLogger = ErrorsCollectorImpl(lock: lock)
+        let networkInfoLogger = NetworkInfoLoggerImpl()
         
         // Core
         
@@ -99,7 +100,8 @@ extension EventQueueAssembly {
         )
         
         let batchSender = BatchSenderImpl(
-            httpClient: coreAssembly.httpClient
+            httpClient: coreAssembly.httpClient,
+            networkInfoLogger: networkInfoLogger
         )
         
         let batchQueue = BatchQueueImpl()

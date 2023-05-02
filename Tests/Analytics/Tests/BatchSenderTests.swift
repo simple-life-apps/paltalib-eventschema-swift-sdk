@@ -13,6 +13,7 @@ import PaltaAnalyticsPrivateModel
 
 final class BatchSenderTests: XCTestCase {
     private var httpMock: HTTPClientMock!
+    private var networkInfoLoggerMock: NetworkInfoLoggerMock!
     
     private var sender: BatchSenderImpl!
     
@@ -25,8 +26,9 @@ final class BatchSenderTests: XCTestCase {
         mockedTimestamp = 25
         
         httpMock = .init()
+        networkInfoLoggerMock = .init()
         
-        sender = BatchSenderImpl(httpClient: httpMock)
+        sender = BatchSenderImpl(httpClient: httpMock, networkInfoLogger: networkInfoLoggerMock)
         
         sender.apiToken = apiToken
         sender.baseURL = url
@@ -144,5 +146,30 @@ final class BatchSenderTests: XCTestCase {
         }
         
         wait(for: [failCalled], timeout: 0.1)
+    }
+    
+    func testNetworkMeasured() {
+        let successCalled = expectation(description: "Success called")
+        let batch = Batch()
+        let urlRequest = URLRequest(url: URL(string: "https://mock.mock")!)
+        let data = Data((0...10).map { _ in UInt8.random(in: 0...200) })
+        
+        httpMock.urlRequest = urlRequest
+        httpMock.response = (nil, data)
+        httpMock.result = .success(EmptyResponse())
+        
+        sender.sendBatch(batch, errorCodes: []) { result in
+            guard case .success = result else {
+                return
+            }
+            
+            successCalled.fulfill()
+        }
+        
+        wait(for: [successCalled], timeout: 0.1)
+        
+        XCTAssert(networkInfoLoggerMock.trace.stopped)
+        XCTAssertEqual(networkInfoLoggerMock.request, urlRequest)
+        XCTAssertEqual(networkInfoLoggerMock.trace.data, data)
     }
 }
