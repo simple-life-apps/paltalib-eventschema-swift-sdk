@@ -118,7 +118,7 @@ extension EventQueueAssembly {
         
         let eventToBatchQueueBridge = EventToBatchQueueBridge(
             eventQueue: core,
-            batchQueue: BatchQueueImpl(),
+            batchQueue: batchQueue,
             batchComposer: batchComposer,
             batchStorage: sqliteStorage
         )
