@@ -1,5 +1,5 @@
 //
-//  NetwokInfo.swift
+//  NetworkInfo.swift
 //  
 //
 //  Created by Vyacheslav Beltyukov on 01/05/2023.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct NetwokInfo {
+struct NetworkInfo {
     /// Request time measured in ms
     let time: Int
     

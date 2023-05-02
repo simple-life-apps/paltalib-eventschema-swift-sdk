@@ -15,6 +15,7 @@ final class BatchComposerTests: XCTestCase {
     private var contextProvider: ContextProviderMock!
     private var userInfoProvider: UserPropertiesKeeperMock!
     private var deviceInfoProvider: DeviceInfoProviderMock!
+    private var networkInfoProvider: NetworkInfoProviderMock!
     
     private var composer: BatchComposerImpl!
     
@@ -25,12 +26,14 @@ final class BatchComposerTests: XCTestCase {
         contextProvider = .init()
         userInfoProvider = .init()
         deviceInfoProvider = .init()
+        networkInfoProvider = .init()
         
         composer = BatchComposerImpl(
             uuidGenerator: uuidGenerator,
             contextProvider: contextProvider,
             userInfoProvider: userInfoProvider,
-            deviceInfoProvider: deviceInfoProvider
+            deviceInfoProvider: deviceInfoProvider,
+            networkInfoProvider: networkInfoProvider
         )
     }
     
@@ -126,5 +129,26 @@ final class BatchComposerTests: XCTestCase {
         XCTAssertEqual(batch.telemetry.serializationErrors, serErrors)
         XCTAssertEqual(batch.telemetry.eventsDropped, 558)
         XCTAssertEqual(batch.telemetry.eventsReportingSpeed, "0.0000000000000000000098")
+    }
+    
+    func testNetworkInfoPresent() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        networkInfoProvider.result = NetworkInfo(time: 1088, speed: 120400000000000000.6)
+        
+        let batch = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertEqual(batch.telemetry.prevRequestTime, 1088)
+        XCTAssertEqual(batch.telemetry.prevConnectionSpeed, "120400000000000000")
+    }
+    
+    func testNetworkInfoMissing() throws {
+        uuidGenerator.uuids = Array(repeating: .init(), count: 100)
+        contextProvider.context = BatchContextMock()
+        
+        let batch = try composer.makeBatch(of: [], with: UUID(), triggerType: .count, telemetry: .mock())
+        
+        XCTAssertFalse(batch.telemetry.hasPrevRequestTime)
+        XCTAssertFalse(batch.telemetry.hasPrevConnectionSpeed)
     }
 }

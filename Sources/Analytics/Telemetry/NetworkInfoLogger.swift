@@ -16,7 +16,7 @@ protocol NetworkInfoLogger {
 }
 
 protocol NetworkInfoProvider {
-    func getRecentNetworkInfo() -> NetwokInfo?
+    func getRecentNetworkInfo() -> NetworkInfo?
 }
 
 private final class NetworkTraceImpl: NetworkTrace {
@@ -55,7 +55,7 @@ final class NetworkInfoLoggerImpl: NetworkInfoLogger, NetworkInfoProvider {
         NetworkTraceImpl(startTime: currentTimestamp(), request: request, logger: self)
     }
     
-    func getRecentNetworkInfo() -> NetwokInfo? {
+    func getRecentNetworkInfo() -> NetworkInfo? {
         lock.lock()
         defer { lock.unlock() }
         
@@ -76,7 +76,7 @@ final class NetworkInfoLoggerImpl: NetworkInfoLogger, NetworkInfoProvider {
         
         sizesAndTimes = []
         
-        return NetwokInfo(
+        return NetworkInfo(
             time: Int(averageTime.rounded()),
             speed: totalSize / totalTime
         )

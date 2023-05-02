@@ -28,3 +28,11 @@ final class NetworkInfoLoggerMock: NetworkInfoLogger {
         return trace
     }
 }
+
+final class NetworkInfoProviderMock: NetworkInfoProvider {
+    var result: NetworkInfo?
+    
+    func getRecentNetworkInfo() -> NetworkInfo? {
+        result
+    }
+}
