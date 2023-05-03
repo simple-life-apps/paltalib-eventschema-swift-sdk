@@ -36,13 +36,10 @@ final class SQLiteStorage {
 
 extension SQLiteStorage: EventStorage {
     func storeEvent(_ event: StorableEvent) {
-        guard let data = try? event.serialize() else {
-            return
-        }
-        
-        let row = RowData(column1: event.event.id.data, column2: data)
-        
         do {
+            let data = try event.serialize()
+            let row = RowData(column1: event.event.id.data, column2: data)
+            
             try client.executeStatement("INSERT INTO events (event_id, event_data) VALUES (?, ?)") { executor in
                 executor.setRow(row)
                 try executor.runStep()
