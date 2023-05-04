@@ -13,6 +13,11 @@ public class PaltaAnalytics {
     private static let lock = NSRecursiveLock()
 
     public static func initiate(with stack: Stack) {
+        guard self.stack != nil else {
+            print("PaltaLib: Analytics: Attempt to double initiate. First stack is used")
+            return
+        }
+
         self.stack = stack
     }
     
