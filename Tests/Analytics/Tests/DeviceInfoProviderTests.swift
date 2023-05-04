@@ -27,7 +27,7 @@ final class DeviceInfoProviderTests: XCTestCase {
 
     func testDevice() {
         // Run on simulator only!
-        XCTAssertEqual(infoProvider.deviceModel, "iPhone")
+        XCTAssertEqual(infoProvider.deviceModel, "iPhone Simulator")
     }
 
     func testNoCarrier() {
