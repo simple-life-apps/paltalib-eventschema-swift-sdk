@@ -27,7 +27,7 @@ final class BatchSendRequestTests: XCTestCase {
         XCTAssertEqual(
             urlRequest?.allHTTPHeaderFields,
             [
-                "X-Client-Upload-TS": "878",
+                "X-SDK-Client-Upload-TS": "878",
                 "DEFAULT_HEADER": "DEFAULT_HEADER_VALUE",
                 "Content-Type": "application/protobuf",
                 "X-SDK-Network-Errors": "1001,5012,2890"
