@@ -24,17 +24,16 @@ final class UUIDGeneratorImpl: UUIDGenerator {
         
         var bytes: uuid_t = (0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
         
-        let timestampSeconds = currentTimestamp() / 1000
-        let timestampMsec = (currentTimestamp() % 1000) & 0x0000000FFF
+        let timestamp = currentTimestamp()
         
         // Implementing UUID v7 spec
         
-        bytes.0 = UInt8(truncatingIfNeeded: timestampSeconds >> 28)
-        bytes.1 = UInt8(truncatingIfNeeded: timestampSeconds >> 20)
-        bytes.2 = UInt8(truncatingIfNeeded: timestampSeconds >> 12)
-        bytes.3 = UInt8(truncatingIfNeeded: timestampSeconds >> 4)
-        bytes.4 = UInt8(truncatingIfNeeded: (timestampSeconds << 4) | (timestampMsec >> 8))
-        bytes.5 = UInt8(truncatingIfNeeded: timestampMsec)
+        bytes.0 = UInt8(truncatingIfNeeded: timestamp >> 40)
+        bytes.1 = UInt8(truncatingIfNeeded: timestamp >> 32)
+        bytes.2 = UInt8(truncatingIfNeeded: timestamp >> 24)
+        bytes.3 = UInt8(truncatingIfNeeded: timestamp >> 16)
+        bytes.4 = UInt8(truncatingIfNeeded: timestamp >> 8)
+        bytes.5 = UInt8(truncatingIfNeeded: timestamp)
         bytes.6 = UInt8(truncatingIfNeeded: 0x70 | seq >> 8)
         bytes.7 = UInt8(truncatingIfNeeded: seq)
         bytes.8 = 0x80 | (UInt8.random() & 0x3F)

@@ -31,23 +31,16 @@ final class UUIDGeneratorTests: XCTestCase {
         XCTAssertEqual(uuids.count, Set(uuids).count)
     }
     
-    func testTimestampSec() {
+    func testTimestamp() {
         mockedTimestamp = 3_556_354_535_502
         let bytes = UUIDGeneratorImpl().generateUUID().uuid
         
-        XCTAssertEqual(bytes.0, 0x0D)
-        XCTAssertEqual(bytes.1, 0x3F)
-        XCTAssertEqual(bytes.2, 0x9A)
-        XCTAssertEqual(bytes.3, 0x9E)
-        XCTAssertEqual(bytes.4 & 0xF0, 0x70)
-    }
-    
-    func testTimestampMsec() {
-        mockedTimestamp = 3_556_354_535_502
-        let bytes = UUIDGeneratorImpl().generateUUID().uuid
-        
-        XCTAssertEqual(bytes.4 & 0x0F, 0x01)
-        XCTAssertEqual(bytes.5, 0xF6)
+        XCTAssertEqual(bytes.0, 0x03)
+        XCTAssertEqual(bytes.1, 0x3C)
+        XCTAssertEqual(bytes.2, 0x07)
+        XCTAssertEqual(bytes.3, 0x3F)
+        XCTAssertEqual(bytes.4, 0xB0)
+        XCTAssertEqual(bytes.5, 0x4E)
     }
     
     func testVer() {
