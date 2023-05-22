@@ -24,7 +24,7 @@ final class PublicFormattersTests: XCTestCase {
         
         let date = dateComponents.date!
         
-        let string = PaltaAnalytics.Formatters.dateFormatter.string(from: date)
+        let string = PaltaAnalytics.Formatters.timestampFormatter.string(from: 733094701805)
         
         XCTAssertEqual(
             string,
@@ -43,7 +43,7 @@ final class PublicFormattersTests: XCTestCase {
         
         let date = dateComponents.date!
         
-        let string = PaltaAnalytics.Formatters.dateFormatter.string(from: date)
+        let string = PaltaAnalytics.Formatters.timestampFormatter.string(from: 1568505600000)
         
         XCTAssertEqual(
             string,
