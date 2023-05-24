@@ -20,6 +20,7 @@ final class BatchComposerImpl: BatchComposer {
         $0.maximumSignificantDigits = 2000
         $0.numberStyle = .decimal
         $0.usesGroupingSeparator = false
+        $0.decimalSeparator = "."
     }
     
     private let uuidGenerator: UUIDGenerator
