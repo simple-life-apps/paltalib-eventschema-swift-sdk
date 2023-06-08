@@ -84,7 +84,7 @@ final class EventFacadeTests: XCTestCase {
         XCTAssertNil(coreMock.sendHandler)
         XCTAssertNotNil(coreMock.removeHandler)
         XCTAssert(sessionManagerMock.startCalled)
-        XCTAssertNotNil(sessionManagerMock.sessionStartLogger)
+        XCTAssertNil(sessionManagerMock.sessionStartLogger)
         XCTAssertFalse(coreMock.forceFlushTriggered)
     }
 
@@ -100,9 +100,9 @@ final class EventFacadeTests: XCTestCase {
     func testSessionStartLogger() {
         sessionManagerMock.sessionStartLogger?(85)
         
-        XCTAssertEqual(eventComposerMock.timestamp, 85)
-        XCTAssertEqual(coreMock.addedEvents.count, 1)
-        XCTAssertEqual(storageMock.storedEvents.count, 1)
+        XCTAssertNil(eventComposerMock.timestamp)
+        XCTAssert(coreMock.addedEvents.isEmpty)
+        XCTAssert(storageMock.storedEvents.isEmpty)
         XCTAssertFalse(sessionManagerMock.refreshSessionCalled)
         XCTAssertFalse(coreMock.forceFlushTriggered)
     }

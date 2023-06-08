@@ -103,20 +103,7 @@ final class EventFacadeImpl: EventFacade {
         }
     }
 
-    private func startSessionManager() {
-        sessionManager.sessionStartLogger = { [weak self] timestamp in
-            guard let self = self else {
-                return
-            }
-            
-            self.logEvent(
-                with: nil,
-                and: self.stack.sessionStartEventPayloadProvider(),
-                timestamp: timestamp,
-                skipRefreshSession: true
-            )
-        }
-        
+    private func startSessionManager() {        
         sessionManager.start()
     }
     
