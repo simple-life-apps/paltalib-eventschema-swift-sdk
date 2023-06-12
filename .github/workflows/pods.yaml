@@ -1,0 +1,19 @@
+name: Push podspec
+on:
+  workflow_dispatch:
+    inputs:
+    
+jobs:
+  push:
+    runs-on: [ macOS-latest ]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Publish to CocoaPod register
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+      run: |
+        pod repo add palta https://github.com/Palta-Data-Platform/paltabrain-cocoapods-specs-mobilesdk.git
+        pod repo push palta PaltaAnalyticsWiring.podspec --allow-warnings
+        pod repo push palta PaltaAnalyticsPrivateModel.podspec --allow-warnings
+        pod repo push palta PaltaAnalyticsModel.podspec --allow-warnings
+        pod repo push palta PaltaAnalytics.podspec --allow-warnings
