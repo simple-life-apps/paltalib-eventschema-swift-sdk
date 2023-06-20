@@ -15,10 +15,10 @@ jobs:
         pod trunk push PaltaAnalyticsWiring.podspec --allow-warnings
         pod trunk push PaltaAnalyticsPrivateModel.podspec --allow-warnings
         pod trunk push PaltaAnalyticsModel.podspec --allow-warnings
-    - name: Sleep for 60s
+    - name: Sleep for 4 min
       uses: juliangruber/sleep-action@v2.0.0
       with:
-        time: 60s
+        time: 240s
   push-main:
     uses: ./.github/workflows/main_pod.yaml
     secrets: inherit
