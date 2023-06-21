@@ -6,11 +6,16 @@
 //
 
 import Foundation
+import PaltaAnalyticsWiring
 import PaltaAnalyticsModel
 
 public class PaltaAnalytics {
     private static var stack: Stack?
     private static let lock = NSRecursiveLock()
+    
+    private let initiated: Void = {
+        PBWiringLauncher.wire()
+    }()
 
     public static func initiate(with stack: Stack) {
         guard self.stack == nil else {

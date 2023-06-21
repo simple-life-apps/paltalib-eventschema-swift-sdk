@@ -16,5 +16,6 @@ Pod::Spec.new do |spec|
   spec.source       = { :git => "https://github.com/Palta-Data-Platform/paltalib-eventschema-swift-sdk.git", :tag => "#{spec.version}" }
 
   spec.source_files  = "Sources/AnalyticsWiring/**/*.{h,m}"
+  spec.public_header_files = "Sources/AnalyticsWiring/Public/*.{h,m}"
 
 end

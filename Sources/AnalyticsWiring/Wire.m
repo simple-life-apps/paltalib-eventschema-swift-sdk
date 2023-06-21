@@ -5,15 +5,11 @@
 //  Created by Vyacheslav Beltyukov on 18/01/2023.
 //
 
-#import <Foundation/Foundation.h>
-
-@interface PBWiringLauncher : NSObject
-
-@end
+#import "Wire.h"
 
 @implementation PBWiringLauncher
 
-+ (void)load {
++ (void)wire {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wundeclared-selector"
     NSBundle* bundle = [NSBundle bundleForClass:self];

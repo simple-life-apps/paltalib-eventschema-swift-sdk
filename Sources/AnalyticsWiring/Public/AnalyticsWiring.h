@@ -8,5 +8,6 @@
 #ifndef AnalyticsWiring_h
 #define AnalyticsWiring_h
 
+#import "Wire.h"
 
 #endif /* AnalyticsWiring_h */
