@@ -2,8 +2,7 @@ name: Push supporting podspecs
 on:
   push:
     tags:
-      - *.*.*
-    
+      - '*'
 jobs:
   push:
     runs-on: [ macOS-latest ]
