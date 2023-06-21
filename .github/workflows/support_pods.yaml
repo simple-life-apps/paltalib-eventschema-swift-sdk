@@ -1,7 +1,8 @@
 name: Push supporting podspecs
 on:
-  workflow_dispatch:
-    inputs:
+  push:
+    tags:
+      - 0.0.**
     
 jobs:
   push:
