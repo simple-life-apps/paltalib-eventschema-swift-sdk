@@ -13,7 +13,7 @@ public class PaltaAnalytics {
     private static var stack: Stack?
     private static let lock = NSRecursiveLock()
     
-    private let initiated: Void = {
+    private static let initiated: Void = {
         PBWiringLauncher.wire()
     }()
 
@@ -33,6 +33,9 @@ public class PaltaAnalytics {
         if let configuredInstance = _shared {
             return configuredInstance
         }
+        
+        // Use instead of dispatch once
+        _ = initiated
         
         guard let stack = stack else {
             fatalError("Attempt to access PaltaAnalytics without setting up")
