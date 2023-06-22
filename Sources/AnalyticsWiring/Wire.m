@@ -6,19 +6,14 @@
 //
 
 #import "Wire.h"
+@import ObjectiveC;
 
 @implementation PBWiringLauncher
 
 + (void)wire {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wundeclared-selector"
-    NSBundle* bundle = [NSBundle bundleForClass:self];
-    
-    if ([bundle.bundlePath hasSuffix:@"xctest"]) {
-        return;
-    }
-    
-    Class class = [bundle classNamed:@"PBEventsWiring"];
+    Class class = objc_lookUpClass("PBEventsWiring");
     [[[class alloc] init] performSelector:@selector(wireStack)];
 #pragma GCC diagnostic pop
 }
