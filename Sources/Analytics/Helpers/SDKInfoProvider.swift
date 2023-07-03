@@ -18,6 +18,6 @@ final class SDKInfoProviderImpl: SDKInfoProvider {
     }
     
     var sdkVersion: String {
-        "3.6.2"
+        global_sdkVersion
     }
 }
