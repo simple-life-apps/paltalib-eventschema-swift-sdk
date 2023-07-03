@@ -1,0 +1,1 @@
+let global_sdkVersion = "github.event.inputs.version"
