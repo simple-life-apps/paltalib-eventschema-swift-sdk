@@ -1,0 +1,29 @@
+name: Set version name in code
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version name to be set'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version name to be set'
+        required: true
+        type: string
+jobs:
+  set_version:
+    runs-on: [ macOS-latest ]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Update version name
+      run: |
+        cd Scripts
+        ./UpdateCodeVersion.swift github.event.inputs.version
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.ref }}
+
