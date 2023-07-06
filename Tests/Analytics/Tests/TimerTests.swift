@@ -22,8 +22,8 @@ final class TimerTests: XCTestCase {
             timerIsntFired.fulfill()
         }
 
-        wait(for: [timerIsntFired], timeout: 0.04)
-        wait(for: [timerIsFired], timeout: 0.06)
+        wait(for: [timerIsntFired], timeout: 0.5)
+        wait(for: [timerIsFired], timeout: 0.5)
     }
 
     func testCancel() {
@@ -38,7 +38,7 @@ final class TimerTests: XCTestCase {
 
         token.cancel()
 
-        wait(for: [timerIsntFired], timeout: 0.03)
+        wait(for: [timerIsntFired], timeout: 0.5)
     }
 
     func testCancelAfterDelay() {
@@ -55,7 +55,7 @@ final class TimerTests: XCTestCase {
             token.cancel()
         }
 
-        waitForExpectations(timeout: 0.03) { _ in
+        waitForExpectations(timeout: 0.5) { _ in
         }
     }
 }

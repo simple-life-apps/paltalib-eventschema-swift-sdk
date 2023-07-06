@@ -57,7 +57,7 @@ import PaltaAnalyticsModel
 //            barrierCalled.fulfill()
 //        }
 //        
-//        wait(for: [barrierCalled], timeout: 0.1)
+//        wait(for: [barrierCalled], timeout: 0.5)
 //    }
 //    
 //    func testSaveEventError() {
@@ -79,7 +79,7 @@ import PaltaAnalyticsModel
 //            barrierCalled.fulfill()
 //        }
 //        
-//        wait(for: [barrierCalled], timeout: 0.1)
+//        wait(for: [barrierCalled], timeout: 0.5)
 //    }
 //    
 //    func testRemoveEvent() throws {
@@ -92,7 +92,7 @@ import PaltaAnalyticsModel
 //        
 //        let barrierCalled1 = expectation(description: "Barrier called 1")
 //        storage.addBarrier(barrierCalled1.fulfill)
-//        wait(for: [barrierCalled1], timeout: 0.1)
+//        wait(for: [barrierCalled1], timeout: 0.5)
 //        
 //        storage.removeEvent(with: event.event.id)
 //        
@@ -107,7 +107,7 @@ import PaltaAnalyticsModel
 //            barrierCalled2.fulfill()
 //        }
 //        
-//        wait(for: [barrierCalled2], timeout: 0.1)
+//        wait(for: [barrierCalled2], timeout: 0.5)
 //    }
 //    
 //    func testLoadEvents() throws {
@@ -130,6 +130,6 @@ import PaltaAnalyticsModel
 //            loadCompleted.fulfill()
 //        }
 //        
-//        wait(for: [loadCompleted], timeout: 0.1)
+//        wait(for: [loadCompleted], timeout: 0.5)
 //    }
 //}

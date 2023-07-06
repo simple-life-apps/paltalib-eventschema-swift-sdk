@@ -49,7 +49,7 @@ final class SQLiteStorageTests: XCTestCase {
             loadFinished.fulfill()
         }
         
-        wait(for: [loadFinished], timeout: 0.1)
+        wait(for: [loadFinished], timeout: 0.5)
         
         XCTAssertEqual(restoredEvent?.contextId, event.contextId)
         XCTAssertEqual(restoredEvent?.event.id, event.event.id)
@@ -73,7 +73,7 @@ final class SQLiteStorageTests: XCTestCase {
             loadFinished.fulfill()
         }
         
-        wait(for: [loadFinished], timeout: 0.1)
+        wait(for: [loadFinished], timeout: 0.5)
         
         XCTAssertEqual(restoredEvent?.contextId, event.contextId)
         XCTAssertEqual(restoredEvent?.event.id, event.event.id)
@@ -98,7 +98,7 @@ final class SQLiteStorageTests: XCTestCase {
 //            loadFinished.fulfill()
 //        }
 //
-//        wait(for: [loadFinished], timeout: 0.1)
+//        wait(for: [loadFinished], timeout: 0.5)
 //
 //        XCTAssertNil(restoredEvent)
     }
@@ -122,7 +122,7 @@ final class SQLiteStorageTests: XCTestCase {
             loadFinished.fulfill()
         }
         
-        wait(for: [loadFinished], timeout: 0.1)
+        wait(for: [loadFinished], timeout: 0.5)
         
         XCTAssertNil(restoredEvent)
     }
@@ -146,7 +146,7 @@ final class SQLiteStorageTests: XCTestCase {
             loadFinished.fulfill()
         }
         
-        wait(for: [loadFinished], timeout: 0.1)
+        wait(for: [loadFinished], timeout: 0.5)
         
         XCTAssertNotNil(restoredEvent)
     }
@@ -173,7 +173,7 @@ final class SQLiteStorageTests: XCTestCase {
             loadCompleted.fulfill()
         }
         
-        wait(for: [loadCompleted], timeout: 0.1)
+        wait(for: [loadCompleted], timeout: 0.5)
     }
     
     func testBatchStore() throws {

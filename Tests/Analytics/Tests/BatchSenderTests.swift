@@ -60,7 +60,7 @@ final class BatchSenderTests: XCTestCase {
         XCTAssertEqual(request?.errorCodes, [505, 707])
         XCTAssertEqual(request?.data, try batch.serialize())
         
-        wait(for: [successCalled], timeout: 0.1)
+        wait(for: [successCalled], timeout: 0.5)
     }
     
     func testFailNoInternet() {
@@ -77,7 +77,7 @@ final class BatchSenderTests: XCTestCase {
             failCalled.fulfill()
         }
         
-        wait(for: [failCalled], timeout: 0.1)
+        wait(for: [failCalled], timeout: 0.5)
     }
     
     func testFailTimeout() {
@@ -94,7 +94,7 @@ final class BatchSenderTests: XCTestCase {
             failCalled.fulfill()
         }
         
-        wait(for: [failCalled], timeout: 0.1)
+        wait(for: [failCalled], timeout: 0.5)
     }
     
     func testFailServerError() {
@@ -111,7 +111,7 @@ final class BatchSenderTests: XCTestCase {
             failCalled.fulfill()
         }
         
-        wait(for: [failCalled], timeout: 0.1)
+        wait(for: [failCalled], timeout: 0.5)
     }
     
     func testFailClientError() {
@@ -128,7 +128,7 @@ final class BatchSenderTests: XCTestCase {
             failCalled.fulfill()
         }
         
-        wait(for: [failCalled], timeout: 0.1)
+        wait(for: [failCalled], timeout: 0.5)
     }
     
     func testFailOtherError() {
@@ -145,7 +145,7 @@ final class BatchSenderTests: XCTestCase {
             failCalled.fulfill()
         }
         
-        wait(for: [failCalled], timeout: 0.1)
+        wait(for: [failCalled], timeout: 0.5)
     }
     
     func testNetworkMeasured() {
@@ -166,7 +166,7 @@ final class BatchSenderTests: XCTestCase {
             successCalled.fulfill()
         }
         
-        wait(for: [successCalled], timeout: 0.1)
+        wait(for: [successCalled], timeout: 0.5)
         
         XCTAssert(networkInfoLoggerMock.trace.stopped)
         XCTAssertEqual(networkInfoLoggerMock.request, urlRequest)

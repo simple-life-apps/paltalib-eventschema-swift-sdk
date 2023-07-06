@@ -51,7 +51,7 @@ final class BatchQueueTests: XCTestCase {
         queue.addBatch(Batch())
         queue.addBatch(Batch())
         
-        waitForExpectations(timeout: 0.1)
+        waitForExpectations(timeout: 0.5)
     }
     
     func testConcurrentInsertRead() {

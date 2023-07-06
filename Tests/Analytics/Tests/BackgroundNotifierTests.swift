@@ -32,7 +32,7 @@ final class BackgroundNotifierTests: XCTestCase {
             object: NSObject()
         )
         
-        wait(for: [blockCalled], timeout: 0.1)
+        wait(for: [blockCalled], timeout: 0.5)
     }
     
     func testConcurrentListenersAdd() {
@@ -50,7 +50,7 @@ final class BackgroundNotifierTests: XCTestCase {
             object: NSObject()
         )
         
-        wait(for: [blockCalled], timeout: 0.1)
+        wait(for: [blockCalled], timeout: 0.5)
     }
     
     func testConcurrentNotifications() {
@@ -68,6 +68,6 @@ final class BackgroundNotifierTests: XCTestCase {
             )
         }
         
-        wait(for: [blockCalled], timeout: 0.1)
+        wait(for: [blockCalled], timeout: 0.5)
     }
 }

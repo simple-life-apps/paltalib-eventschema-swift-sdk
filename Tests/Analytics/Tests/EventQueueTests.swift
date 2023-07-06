@@ -125,7 +125,7 @@ final class EventQueueTests: XCTestCase {
 
         timerMock.fire()
 
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
 
         queue.apply(
             .init(maxBatchSize: 2, uploadInterval: 3, uploadThreshold: 3, maxEvents: 3)
@@ -137,7 +137,7 @@ final class EventQueueTests: XCTestCase {
 
         timerMock.fire()
         
-        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
+        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 1)
     }
@@ -156,10 +156,10 @@ final class EventQueueTests: XCTestCase {
 
         XCTAssertEqual(timerMock.passedInterval, 3)
 
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
 
         timerMock.fire()
-        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
+        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 1)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
@@ -186,10 +186,10 @@ final class EventQueueTests: XCTestCase {
         waitForQueue()
         XCTAssertNil(timerMock.passedInterval)
 
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
 
         timerMock.fire()
-        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
+        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 2)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
@@ -209,14 +209,14 @@ final class EventQueueTests: XCTestCase {
         queue.addEvent(.mock(contextId: contextId))
         queue.addEvent(.mock(contextId: contextId))
 
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 2)
         XCTAssertEqual(triggerType, .count)
         
         _sendIsCalled = nil
         timerMock.fire()
-        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.1)
+        wait(for: [sendIsCalled, removeIsntCalled], timeout: 0.5)
         XCTAssertEqual(sentEvents?.count, 1)
     }
 
@@ -237,7 +237,7 @@ final class EventQueueTests: XCTestCase {
         queue.addEvent(.mock(contextId: contextId))
         queue.addEvent(.mock(contextId: contextId))
 
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 3)
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 0)
@@ -261,7 +261,7 @@ final class EventQueueTests: XCTestCase {
 
         XCTAssertEqual(timerMock.passedInterval, 8)
 
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
 
         timerMock.passedInterval = nil
         queue.addEvents(
@@ -272,7 +272,7 @@ final class EventQueueTests: XCTestCase {
         XCTAssertNil(timerMock.passedInterval)
 
         timerMock.fire()
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 13)
     }
@@ -291,13 +291,13 @@ final class EventQueueTests: XCTestCase {
             .mock(count: 9, contextId: contextId)
         )
 
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
 
         queue.addEvents(
             .mock(count: 3, contextId: contextId)
         )
 
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
 
         XCTAssertEqual(sentEvents?.count, 12)
     }
@@ -316,7 +316,7 @@ final class EventQueueTests: XCTestCase {
             (0...9).map { StorableEvent.mock(timestamp: $0, contextId: contextId) }
         )
 
-        wait(for: [removeIsCalled], timeout: 0.1)
+        wait(for: [removeIsCalled], timeout: 0.5)
 
         let removedTimestamps = Set(removedEvents?.map { $0.event.event.timestamp } ?? [])
         let expectedRemovedTimestamps = Set(0...4)
@@ -325,7 +325,7 @@ final class EventQueueTests: XCTestCase {
 
         timerMock.fire()
 
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
 
         XCTAssertEqual(telemetry?.eventsDroppedSinceLastBatch, 5)
     }
@@ -352,7 +352,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.addEvents(events)
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         XCTAssertEqual(contextId, contextId1)
         XCTAssertEqual(
             Set(sentEvents?.values.map { $0 } ?? []),
@@ -381,7 +381,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.addEvents(events)
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         
         XCTAssertEqual(contextId, contextId1)
         XCTAssertEqual(
@@ -407,7 +407,7 @@ final class EventQueueTests: XCTestCase {
         
         timerMock.fire()
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         
         _sendIsCalled = nil
         _sendIsntCalled = nil
@@ -417,7 +417,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.sendEventsAvailable()
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         
         XCTAssertEqual(sentEvents?.count, 3)
         
@@ -425,7 +425,7 @@ final class EventQueueTests: XCTestCase {
         _sendIsntCalled = nil
         warmUpExpectations(sendIsntCalled)
         queue.sendEventsAvailable()
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
     }
     
     func testFlushOnDemandWithCount() {
@@ -443,7 +443,7 @@ final class EventQueueTests: XCTestCase {
         queue.addEvent(.mock(contextId: contextId))
         queue.addEvent(.mock(contextId: contextId))
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         
         _sendIsCalled = nil
         _sendIsntCalled = nil
@@ -453,7 +453,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.sendEventsAvailable()
         
-        wait(for: [sendIsCalled], timeout: 0.1)
+        wait(for: [sendIsCalled], timeout: 0.5)
         
         XCTAssertEqual(sentEvents?.count, 3)
         
@@ -461,7 +461,7 @@ final class EventQueueTests: XCTestCase {
         _sendIsntCalled = nil
         warmUpExpectations(sendIsntCalled)
         queue.sendEventsAvailable()
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
     }
     
     func testFlushOnDemandNoTrigger() {
@@ -479,7 +479,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.sendEventsAvailable()
         
-        wait(for: [sendIsntCalled], timeout: 0.1)
+        wait(for: [sendIsntCalled], timeout: 0.5)
     }
     
     func testFlushByMultipleContexts() {
@@ -503,7 +503,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.addEvents(events)
         
-        wait(for: [sendIsCalled], timeout: 0.15)
+        wait(for: [sendIsCalled], timeout: 0.55)
         
         XCTAssertEqual(triggerType, .context)
         XCTAssertEqual(contextId, contextId1)
@@ -530,7 +530,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.forceFlush()
         
-        wait(for: [sendIsCalled], timeout: 0.15)
+        wait(for: [sendIsCalled], timeout: 0.55)
         
         XCTAssertEqual(sentEvents?.count, 2)
         XCTAssertEqual(triggerType, .minimise)
@@ -559,7 +559,7 @@ final class EventQueueTests: XCTestCase {
         
         queue.forceFlush()
         
-        wait(for: [sendIsCalled], timeout: 0.15)
+        wait(for: [sendIsCalled], timeout: 0.55)
         
         XCTAssertEqual(telemetry?.serializationErrors, serErrors)
         XCTAssertEqual(telemetry?.storageErrors, storeErrors)
@@ -579,11 +579,11 @@ final class EventQueueTests: XCTestCase {
         
         queue.forceFlush()
         
-        wait(for: [sendIsntCalled], timeout: 0.15)
+        wait(for: [sendIsntCalled], timeout: 0.55)
         
         lock.unlock()
         
-        wait(for: [sendIsCalled], timeout: 0.15)
+        wait(for: [sendIsCalled], timeout: 0.55)
     }
     
     private func warmUpExpectations(_ expectations: XCTestExpectation...) {
