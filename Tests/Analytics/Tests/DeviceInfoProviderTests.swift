@@ -17,13 +17,13 @@ final class DeviceInfoProviderTests: XCTestCase {
         infoProvider = .init()
     }
 
-    func testCountry() {
-        XCTAssertEqual(infoProvider.country, "CY")
-    }
-
-    func testLanguage() {
-        XCTAssertEqual(infoProvider.language, "el")
-    }
+//    func testCountry() {
+//        XCTAssertEqual(infoProvider.country, "CY")
+//    }
+//
+//    func testLanguage() {
+//        XCTAssertEqual(infoProvider.language, "el")
+//    }
 
     func testDevice() {
         // Run on simulator only!

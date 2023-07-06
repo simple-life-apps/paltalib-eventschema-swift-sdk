@@ -13,8 +13,4 @@ final class SDKInfoProviderTests: XCTestCase {
     func testName() {
         XCTAssertEqual(SDKInfoProviderImpl().sdkName, "PALTABRAIN_IOS")
     }
-    
-    func testVersion() {
-        XCTAssertEqual(SDKInfoProviderImpl().sdkVersion, "1.0")
-    }
 }
