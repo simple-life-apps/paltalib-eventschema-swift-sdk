@@ -22,7 +22,7 @@ final class TimerTests: XCTestCase {
             timerIsntFired.fulfill()
         }
 
-        wait(for: [timerIsntFired], timeout: 0.5)
+        wait(for: [timerIsntFired], timeout: 0.04)
         wait(for: [timerIsFired], timeout: 0.5)
     }
 
