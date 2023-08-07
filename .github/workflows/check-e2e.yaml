@@ -1,0 +1,11 @@
+name: Check e2e tests
+on:
+  workflow_dispatch:
+    inputs:
+jobs:
+  check-tests:
+    uses: Palta-Data-Platform/event-schema-e2e-testing/.github/workflows/test.yml@main
+    secrets: inherit
+    with:
+      client: "mobilesdk"
+
