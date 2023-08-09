@@ -4,6 +4,9 @@
 .swiftpm
 .DS_Store
 
+# Private git package that is being checked out while testing
+/testing-only
+
 ## User settings
 xcuserdata/
 
