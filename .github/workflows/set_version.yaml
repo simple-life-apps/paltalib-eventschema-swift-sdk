@@ -20,7 +20,7 @@ jobs:
     - name: Update version name
       run: |
         cd Scripts
-        ./UpdateCodeVersion.swift github.event.inputs.version
+        ./UpdateCodeVersion.swift ${{ github.event.inputs.version }}
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
