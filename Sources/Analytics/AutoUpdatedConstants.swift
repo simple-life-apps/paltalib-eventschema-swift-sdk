@@ -1,1 +1,1 @@
-let global_sdkVersion = "github.event.inputs.version"
+let global_sdkVersion = "3.7.0"
