@@ -24,7 +24,10 @@ final class SendEventsTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         
-        PaltaAnalytics.shared.setAPIKey("some-api-key", and: URL(string: "https://example.com"))
+        PaltaAnalytics.shared.setAPIKey(
+            "0037c694a811422a88e2a3c5a90510e3",
+            and: URL(string: "https://telemetry.mobilesdk.dev.paltabrain.com")
+        )
     }
     
     override func tearDownWithError() throws {
