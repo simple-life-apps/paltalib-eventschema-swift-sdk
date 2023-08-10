@@ -1,0 +1,19 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'SendEvents' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  pod 'PaltaEvents', :path => '../testing-only'
+  pod 'PaltaEventsTransport', :path => '../testing-only'
+  
+  pod 'PaltaAnalytics', :path => '..'
+  pod 'PaltaAnalyticsModel', :path => '..'
+  pod 'PaltaAnalyticsPrivateModel', :path => '..'
+  pod 'PaltaAnalyticsWiring', :path => '..'
+  
+  target 'SendEventsTests' do
+  end
+
+end

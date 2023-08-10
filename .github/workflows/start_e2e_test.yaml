@@ -1,0 +1,59 @@
+name: Start e2e test
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to test'
+        required: true
+        type: string
+      branch:
+        description: 'Branch to test'
+        required: true
+        type: string
+      nextAction:
+        description: 'What to do if test is success'
+        required: true
+        type: string
+jobs:
+  run_events_generation:
+    runs-on: macos-latest
+    outputs:
+      event_times: ${{ steps.run_test.outputs.event_times }}
+      event_names: ${{ steps.run_test.outputs.event_names }}
+      event_properties: ${{ steps.run_test.outputs.event_properties }}
+      header_properties: ${{ steps.run_test.outputs.header_properties }}
+      context_properties: ${{ steps.run_test.outputs.context_properties }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Checkout event schema generated code
+        uses: actions/checkout@v3
+        with:
+          repository: 'Palta-Data-Platform/paltabrain-event-schema-swift-mobilesdk'
+          token: ${{ secrets.TOKEN_FOR_GITHUB }}
+          path: testing-only
+      - name: Install xcparse
+        run: 'brew install chargepoint/xcparse/xcparse'
+      - id: run_test
+        name: Run test project
+        run: |
+          cd E2ETesting
+          ./run_e2e.sh
+          echo "event_times=$event_times" >> "$GITHUB_OUTPUT"
+          echo "event_names=$event_names" >> "$GITHUB_OUTPUT"
+          echo "event_properties=$event_properties" >> "$GITHUB_OUTPUT"
+          echo "header_properties=$header_properties" >> "$GITHUB_OUTPUT"
+          echo "context_properties=$context_properties" >> "$GITHUB_OUTPUT"
+  upload_artifact:
+    needs: run_events_generation
+    uses: Palta-Data-Platform/event-schema-e2e-testing/.github/workflows/upload.yml@main
+    with:
+      sdkVersion: ${{ github.event.inputs.version }}
+      sdkName: 'PALTABRAIN_IOS'
+      nextAction: ${{ github.event.inputs.nextAction }}
+      eventTimes: ${{ needs.run_events_generation.outputs.event_times }}
+      eventNames: ${{ needs.run_events_generation.outputs.event_names }}
+      eventProperties: ${{ needs.run_events_generation.outputs.event_properties }}
+      eventHeaders: ${{ needs.run_events_generation.outputs.header_properties }}
+      eventContexts: ${{ needs.run_events_generation.outputs.context_properties }}
+    secrets: inherit
