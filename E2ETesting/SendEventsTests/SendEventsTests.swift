@@ -46,17 +46,26 @@ final class SendEventsTests: XCTestCase {
         let encoder = JSONEncoder()
         
         let evPropStr = try runs
-            .map { try String(data: encoder.encode(CodableDictionary($0.eventProperties)), encoding: .utf8)! }
+            .map {
+                try String(data: encoder.encode(CodableDictionary($0.eventProperties)), encoding: .utf8)!
+            }
+            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
             .joined(separator: " ")
         addAttachment(with: "event-properties", and: evPropStr)
         
         let hPropStr = try runs
-            .map { try String(data: encoder.encode(CodableDictionary($0.headerProperties)), encoding: .utf8)! }
+            .map {
+                try String(data: encoder.encode(CodableDictionary($0.headerProperties)), encoding: .utf8)!
+            }
+            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
             .joined(separator: " ")
         addAttachment(with: "header-properties", and: hPropStr)
         
         let cPropStr = try runs
-            .map { try String(data: encoder.encode(CodableDictionary($0.contextProperties)), encoding: .utf8)! }
+            .map {
+                try String(data: encoder.encode(CodableDictionary($0.contextProperties)), encoding: .utf8)!
+            }
+            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
             .joined(separator: " ")
         addAttachment(with: "context-properties", and: cPropStr)
     }
