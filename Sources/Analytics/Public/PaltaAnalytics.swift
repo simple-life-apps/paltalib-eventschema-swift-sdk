@@ -63,4 +63,12 @@ public class PaltaAnalytics {
     init(assembly: AnalyticsAssembly?) {
         self.assembly = assembly
     }
+    
+    #if E2E_TESTING
+    
+    static func dropInstance() {
+        _shared = nil
+    }
+    
+    #endif
 }

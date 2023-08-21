@@ -25,8 +25,8 @@ final class SendEventsTests: XCTestCase {
         try super.setUpWithError()
         
         PaltaAnalytics.shared.setAPIKey(
-            "0037c694a811422a88e2a3c5a90510e3",
-            and: URL(string: "https://telemetry.mobilesdk.dev.paltabrain.com")
+            "704c3db5ab2d45ef90c8eeb45d9c8cff",
+            and: URL(string: "https://telemetry.mobilesdk.paltabrain.com")
         )
     }
     
@@ -43,38 +43,24 @@ final class SendEventsTests: XCTestCase {
             .joined(separator: " ")
         addAttachment(with: "names", and: namesStr)
         
-        let encoder = JSONEncoder()
+        try addJSONAttachment(with: "event-properties") {
+            $0.eventProperties
+        }
         
-        let evPropStr = try runs
-            .map {
-                try String(data: encoder.encode(CodableDictionary($0.eventProperties)), encoding: .utf8)!
-            }
-            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
-            .joined(separator: " ")
-        addAttachment(with: "event-properties", and: evPropStr)
+        try addJSONAttachment(with: "header-properties") {
+            $0.headerProperties
+        }
         
-        let hPropStr = try runs
-            .map {
-                try String(data: encoder.encode(CodableDictionary($0.headerProperties)), encoding: .utf8)!
-            }
-            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
-            .joined(separator: " ")
-        addAttachment(with: "header-properties", and: hPropStr)
-        
-        let cPropStr = try runs
-            .map {
-                try String(data: encoder.encode(CodableDictionary($0.contextProperties)), encoding: .utf8)!
-            }
-            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
-            .joined(separator: " ")
-        addAttachment(with: "context-properties", and: cPropStr)
+        try addJSONAttachment(with: "context-properties") {
+            $0.contextProperties
+        }
     }
 
     func testAllCases() throws {
-        testEdgeCase()
+        edgeCase()
     }
     
-    private func testEdgeCase() {
+    private func edgeCase() {
         let event = EdgeCaseEvent(
             propBoolean: true,
             propEnum: .skip,
@@ -100,6 +86,25 @@ final class SendEventsTests: XCTestCase {
                 contextProperties: [:]
             )
         )
+        
+        waitForFlush()
+    }
+    
+    private func waitForFlush() {
+        let expectation = self.expectation(description: "Wait for flush \(UUID())")
+        expectation.isInverted = true
+        wait(for: [expectation], timeout: 35)
+    }
+    
+    private func addJSONAttachment(with name: String, _ contentExtractor: (Run) -> [String: Any]) throws {
+        let encoder = JSONEncoder()
+        let string = try runs
+            .map {
+                try String(data: encoder.encode(CodableDictionary(contentExtractor($0))), encoding: .utf8)!
+            }
+            .map { "\"\($0.replacing("\"", with: "\\\""))\"" }
+            .joined(separator: " ")
+        addAttachment(with: name, and: string)
     }
     
     private func addAttachment(with name: String, and content: String) {
