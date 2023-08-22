@@ -41,7 +41,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          ref: ${{ github.event.inputs.branch }}
+          ref: ${{ inputs.branch }}
       - name: Checkout event schema generated code
         uses: actions/checkout@v3
         with:
@@ -59,9 +59,9 @@ jobs:
     needs: run_events_generation
     uses: Palta-Data-Platform/event-schema-e2e-testing/.github/workflows/upload.yml@main
     with:
-      sdkVersion: ${{ github.event.inputs.version }}
+      sdkVersion: ${{ inputs.version }}
       sdkName: 'PALTABRAIN_IOS'
-      nextAction: ${{ github.event.inputs.nextAction }}
+      nextAction: ${{ inputs.nextAction }}
       eventTimes: ${{ needs.run_events_generation.outputs.event_times }}
       eventNames: ${{ needs.run_events_generation.outputs.event_names }}
       eventProperties: ${{ needs.run_events_generation.outputs.event_properties }}
