@@ -14,6 +14,20 @@ on:
         description: 'What to do if test is success'
         required: true
         type: string
+  workflow_call:
+    inputs:
+      version:
+        description: 'Version to test'
+        required: true
+        type: string
+      branch:
+        description: 'Branch to test'
+        required: true
+        type: string
+      nextAction:
+        description: 'What to do if test is success'
+        required: true
+        type: string
 jobs:
   run_events_generation:
     runs-on: macos-latest
