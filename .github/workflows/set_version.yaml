@@ -13,6 +13,7 @@ on:
         required: true
         type: string
       branch:
+        description: 'On which branch update version'
         required: false
         type: string
 jobs:
@@ -21,14 +22,14 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-        ref: ${{ github.event.inputs.branch }}
+        ref: ${{ inputs.branch }}
     - name: Update version name
       run: |
         cd Scripts
-        ./UpdateCodeVersion.swift ${{ github.event.inputs.version }}
+        ./UpdateCodeVersion.swift ${{ inputs.version }}
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.ref }}
+        branch: ${{ inputs.branch || github.ref }}
 
