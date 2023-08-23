@@ -1,8 +1,6 @@
 name: Push supporting podspecs
 on:
-  push:
-    tags:
-      - '*'
+  workflow_call:
 jobs:
   push:
     runs-on: [ macOS-latest ]
