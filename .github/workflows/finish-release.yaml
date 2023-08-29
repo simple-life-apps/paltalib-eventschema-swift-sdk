@@ -26,3 +26,5 @@ jobs:
     uses: ./.github/workflows/support_pods.yaml
     secrets: inherit
     needs: create_tag
+    with:
+      branch: "release/${{ inputs.versionName || github.event.client_payload.version }}"

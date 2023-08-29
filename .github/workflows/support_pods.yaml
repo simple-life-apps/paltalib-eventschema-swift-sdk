@@ -1,11 +1,16 @@
 name: Push supporting podspecs
 on:
   workflow_call:
+    inputs:
+      branch:
+        type: string
 jobs:
   push:
     runs-on: [ macOS-latest ]
     steps:
     - uses: actions/checkout@v1
+      with:
+        ref: ${{ inputs.branch || github.ref }}
     - name: Publish to CocoaPod register
       env:
         COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
@@ -21,3 +26,5 @@ jobs:
     uses: ./.github/workflows/main_pod.yaml
     secrets: inherit
     needs: push
+    with:
+      branch: ${{ inputs.branch }}
