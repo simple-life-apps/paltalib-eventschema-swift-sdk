@@ -12,9 +12,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: rickstaa/action-create-tag@v1
         with:
-          tag: ${{ inputs.versionName || github.event.client_payload.version }}
+          ref: "release/${{ inputs.versionName || github.event.client_payload.version }}"
+      - name: Set tag
+        run: |
+          git tag ${{ inputs.versionName || github.event.client_payload.version }}
+      - uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "release/${{ inputs.versionName || github.event.client_payload.version }}"
+          tags: true
   publish_cocoapods:
     uses: ./.github/workflows/support_pods.yaml
     secrets: inherit
