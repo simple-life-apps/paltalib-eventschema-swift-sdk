@@ -15,6 +15,7 @@ public extension PaltaAnalytics {
             $0.decimalSeparator = "."
             $0.maximumSignificantDigits = 10
             $0.maximumFractionDigits = 10
+            $0.generatesDecimalNumbers = true
         }
     }
     
