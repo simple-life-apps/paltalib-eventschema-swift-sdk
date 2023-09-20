@@ -33,4 +33,8 @@ final class EventMock: Event {
     func asJSON() -> [String : Any] {
         [:]
     }
+    
+    func asJSON(withContext: Bool) -> [String : Any] {
+        [:]
+    }
 }

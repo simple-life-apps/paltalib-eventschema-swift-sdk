@@ -16,4 +16,5 @@ public protocol Event {
     var name: String { get }
     
     func asJSON() -> [String: Any]
+    func asJSON(withContext: Bool) -> [String: Any]
 }
