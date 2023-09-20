@@ -79,7 +79,7 @@ final class SendEventsTests: XCTestCase {
                 eventProperties: [
                     "prop_boolean": true,
                     "prop_enum": "RESULT_SKIP",
-                    "prop_integer": 349,
+                    "prop_integer": 349 as Int,
                     "prop_string": "String for E2E testing"
                 ],
                 headerProperties: [:],
