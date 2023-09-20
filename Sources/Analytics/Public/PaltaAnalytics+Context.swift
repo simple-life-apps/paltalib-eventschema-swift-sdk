@@ -12,4 +12,8 @@ public extension PaltaAnalytics {
     func _editContext<C: BatchContext>(_ modifier: (inout C) -> Void) {
         assembly?.eventQueueAssembly.contextModifier.editContext(modifier)
     }
+    
+    func _getContext<C: BatchContext>() -> C {
+        assembly?.eventQueueAssembly.contextProvider.context as? C ?? C()
+    }
 }

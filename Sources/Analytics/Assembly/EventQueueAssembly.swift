@@ -15,6 +15,7 @@ final class EventQueueAssembly {
     let batchSendController: BatchSendController
     let batchSender: BatchSenderImpl
     let contextModifier: ContextModifier
+    let contextProvider: CurrentContextProvider
     let eventToBatchQueueBridge: EventToBatchQueueBridge
     
     init(
@@ -23,6 +24,7 @@ final class EventQueueAssembly {
         batchSendController: BatchSendController,
         batchSender: BatchSenderImpl,
         contextModifier: ContextModifier,
+        contextProvider: CurrentContextProvider,
         eventToBatchQueueBridge: EventToBatchQueueBridge
     ) {
         self.eventQueue = eventQueue
@@ -30,6 +32,7 @@ final class EventQueueAssembly {
         self.batchSendController = batchSendController
         self.batchSender = batchSender
         self.contextModifier = contextModifier
+        self.contextProvider = contextProvider
         self.eventToBatchQueueBridge = eventToBatchQueueBridge
     }
 }
@@ -142,6 +145,7 @@ extension EventQueueAssembly {
             batchSendController: sendController,
             batchSender: batchSender,
             contextModifier: currentContextManager,
+            contextProvider: currentContextManager,
             eventToBatchQueueBridge: eventToBatchQueueBridge
         )
     }
