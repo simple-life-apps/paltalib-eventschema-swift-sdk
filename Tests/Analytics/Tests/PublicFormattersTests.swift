@@ -10,20 +10,6 @@ import XCTest
 
 final class PublicFormattersTests: XCTestCase {
     func testDate() {
-        let dateComponents = DateComponents(
-            calendar: .current,
-            timeZone: TimeZone(secondsFromGMT: 0),
-            year: 1993,
-            month: 3,
-            day: 25,
-            hour: 21,
-            minute: 25,
-            second: 1,
-            nanosecond: 805000000
-        )
-        
-        let date = dateComponents.date!
-        
         let string = PaltaAnalytics.Formatters.timestampFormatter.string(from: 733094701805)
         
         XCTAssertEqual(
@@ -33,16 +19,6 @@ final class PublicFormattersTests: XCTestCase {
     }
     
     func testDateZeroes() {
-        let dateComponents = DateComponents(
-            calendar: .current,
-            timeZone: TimeZone(secondsFromGMT: 0),
-            year: 2019,
-            month: 9,
-            day: 15
-        )
-        
-        let date = dateComponents.date!
-        
         let string = PaltaAnalytics.Formatters.timestampFormatter.string(from: 1568505600000)
         
         XCTAssertEqual(
