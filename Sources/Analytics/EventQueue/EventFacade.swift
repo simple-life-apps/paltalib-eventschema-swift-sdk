@@ -51,6 +51,7 @@ final class EventFacadeImpl: EventFacade {
     
     func logEvent<E: Event>(_ incomingEvent: E) {
         do {
+            logger.log(.event, prepareLogMessage(for: incomingEvent))
             logEvent(
                 with: try incomingEvent.header?.serialized(),
                 and: try incomingEvent.payload.serialized(),
@@ -114,6 +115,23 @@ final class EventFacadeImpl: EventFacade {
         backgroundNotifier.addListener { [weak self] in
             self?.core.forceFlush()
         }
+    }
+    
+    private func prepareLogMessage(for event: any Event) -> String {
+        let name = event.name
+        let propertiesInitialString = String(
+            data: (try? JSONSerialization.data(
+                withJSONObject: event.asJSON(withContext: true),
+                options: [.prettyPrinted, .sortedKeys]
+            )) ?? Data(),
+            encoding: .utf8
+        ) ?? ""
+        let propertiesFormattedString = propertiesInitialString
+            .components(separatedBy: "\n")
+            .map { "    \($0)" }
+            .joined(separator: "\n")
+        
+        return "\(name)(\n\(propertiesFormattedString)\n)"
     }
 }
 
