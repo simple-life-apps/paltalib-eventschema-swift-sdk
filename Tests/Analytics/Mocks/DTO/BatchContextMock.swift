@@ -29,4 +29,8 @@ struct BatchContextMock: BatchContext, Equatable {
     func serialize() throws -> Data {
         return data
     }
+    
+    func asJSON() -> [String : Any] {
+        [:]
+    }
 }

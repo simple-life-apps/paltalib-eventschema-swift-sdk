@@ -90,7 +90,7 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
     private func prepareLogMessage(for context: any BatchContext) -> String {
         String(
             data: (try? JSONSerialization.data(
-                withJSONObject: context,
+                withJSONObject: context.asJSON(),
                 options: [.prettyPrinted, .sortedKeys]
             )) ?? Data(),
             encoding: .utf8
