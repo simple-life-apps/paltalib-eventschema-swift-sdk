@@ -38,7 +38,8 @@ final class EventFacadeTests: XCTestCase {
             sessionManager: sessionManagerMock,
             contextProvider: contextProviderMock,
             backgroundNotifier: backgroundNotifierMock,
-            errorLogger: ErrorsCollectorMock()
+            errorLogger: ErrorsCollectorMock(),
+            logger: DefaultLogger(messageTypes: .all)
         )
     }
     
@@ -73,7 +74,8 @@ final class EventFacadeTests: XCTestCase {
             sessionManager: sessionManagerMock,
             contextProvider: contextProviderMock,
             backgroundNotifier: backgroundNotifierMock,
-            errorLogger: ErrorsCollectorMock()
+            errorLogger: ErrorsCollectorMock(),
+            logger: DefaultLogger(messageTypes: .all)
         )
 
         try XCTAssertEqual(

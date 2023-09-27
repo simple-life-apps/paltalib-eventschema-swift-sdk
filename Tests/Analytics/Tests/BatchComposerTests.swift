@@ -36,7 +36,8 @@ final class BatchComposerTests: XCTestCase {
             userInfoProvider: userInfoProvider,
             deviceInfoProvider: deviceInfoProvider,
             networkInfoProvider: networkInfoProvider,
-            storageSpaceProvider: storageSpaceProvider
+            storageSpaceProvider: storageSpaceProvider,
+            logger: DefaultLogger(messageTypes: .all)
         )
     }
     

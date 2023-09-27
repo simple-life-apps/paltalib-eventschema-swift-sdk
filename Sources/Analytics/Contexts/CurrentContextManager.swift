@@ -46,10 +46,12 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
     
     private let stack: Stack
     private let storage: ContextStorage
+    private let logger: Logger
     
-    init(stack: Stack, storage: ContextStorage) {
+    init(stack: Stack, storage: ContextStorage, logger: Logger) {
         self.stack = stack
         self.storage = storage
+        self.logger = logger
     }
     
     func editContext<Context: BatchContext>(_ editor: (inout Context) -> Void) {
@@ -61,7 +63,7 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
         do {
             try storage.saveContext(context, with: currentContextId)
         } catch {
-            print("PaltaLib: Analytics: Error saving context: \(context)")
+            logger.log(.error, "Error saving context: \(context)")
         }
         
         _context = context
@@ -72,7 +74,7 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
         do {
             try storage.stripContexts(excluding: contextIds)
         } catch {
-            print("PaltaLib: Analytics: Error stripping contexts: \(context)")
+            logger.log(.error, "Error stripping contexts: \(context)")
         }
     }
     

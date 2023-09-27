@@ -44,7 +44,7 @@ public class PaltaAnalytics {
         let assembly: AnalyticsAssembly?
         
         do {
-            assembly = try AnalyticsAssembly(stack: stack)
+            assembly = try AnalyticsAssembly(stack: stack, loggingPolicy: _loggingPolicy)
         } catch {
             print("PaltaLib: Analytics: Failed to initialize instance. No events are tracked!")
             assembly = nil
@@ -56,7 +56,7 @@ public class PaltaAnalytics {
         return shared
     }
     
-    private static var _shared: PaltaAnalytics?
+    static var _shared: PaltaAnalytics?
     
     let assembly: AnalyticsAssembly?
     

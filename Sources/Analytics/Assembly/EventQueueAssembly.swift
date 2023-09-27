@@ -17,6 +17,7 @@ final class EventQueueAssembly {
     let contextModifier: ContextModifier
     let contextProvider: CurrentContextProvider
     let eventToBatchQueueBridge: EventToBatchQueueBridge
+    let proxyLogger: ProxyLogger
     
     init(
         eventQueue: EventFacadeImpl,
@@ -25,7 +26,8 @@ final class EventQueueAssembly {
         batchSender: BatchSenderImpl,
         contextModifier: ContextModifier,
         contextProvider: CurrentContextProvider,
-        eventToBatchQueueBridge: EventToBatchQueueBridge
+        eventToBatchQueueBridge: EventToBatchQueueBridge,
+        proxyLogger: ProxyLogger
     ) {
         self.eventQueue = eventQueue
         self.eventQueueCore = eventQueueCore
@@ -34,6 +36,7 @@ final class EventQueueAssembly {
         self.contextModifier = contextModifier
         self.contextProvider = contextProvider
         self.eventToBatchQueueBridge = eventToBatchQueueBridge
+        self.proxyLogger = proxyLogger
     }
 }
 
@@ -41,8 +44,12 @@ extension EventQueueAssembly {
     convenience init(
         stack: Stack,
         coreAssembly: CoreAssembly,
-        analyticsCoreAssembly: AnalyticsCoreAssembly
+        analyticsCoreAssembly: AnalyticsCoreAssembly,
+        loggingPolicy: PaltaAnalytics.LoggingPolicy
     ) throws {
+        let proxyLogger = ProxyLogger()
+        proxyLogger.update(with: loggingPolicy)
+        
         let workingUrl = try FileManager.default.url(
             for: .libraryDirectory,
             in: .userDomainMask,
@@ -87,11 +94,11 @@ extension EventQueueAssembly {
             fileManager: .default
         )
         
-        let sqliteStorage = try SQLiteStorage(errorsLogger: storeErrorsLogger, folderURL: workingUrl)
+        let sqliteStorage = try SQLiteStorage(errorsLogger: storeErrorsLogger, folderURL: workingUrl, logger: proxyLogger)
         
         // Context
         
-        let currentContextManager = CurrentContextManager(stack: stack, storage: contextStorage)
+        let currentContextManager = CurrentContextManager(stack: stack, storage: contextStorage, logger: proxyLogger)
         
         // Batches
         
@@ -101,7 +108,8 @@ extension EventQueueAssembly {
             userInfoProvider: analyticsCoreAssembly.userPropertiesKeeper,
             deviceInfoProvider: analyticsCoreAssembly.deviceInfoProvider,
             networkInfoProvider: networkInfoLogger,
-            storageSpaceProvider: StorageSpaceProviderImpl(folderURL: workingUrl, fileManager: .default)
+            storageSpaceProvider: StorageSpaceProviderImpl(folderURL: workingUrl, fileManager: .default),
+            logger: proxyLogger
         )
         
         let batchSender = BatchSenderImpl(
@@ -116,6 +124,7 @@ extension EventQueueAssembly {
             batchStorage: sqliteStorage,
             batchSender: batchSender,
             timer: TimerImpl(),
+            logger: proxyLogger,
             taskProvider: { BatchSendTaskImpl(batch: $0) }
         )
         
@@ -123,7 +132,8 @@ extension EventQueueAssembly {
             eventQueue: core,
             batchQueue: batchQueue,
             batchComposer: batchComposer,
-            batchStorage: sqliteStorage
+            batchStorage: sqliteStorage,
+            logger: proxyLogger
         )
         
         // EventQueue
@@ -136,7 +146,8 @@ extension EventQueueAssembly {
             sessionManager: analyticsCoreAssembly.sessionManager,
             contextProvider: currentContextManager,
             backgroundNotifier: BackgroundNotifierImpl(notificationCenter: .default),
-            errorLogger: serializationErrorsLogger
+            errorLogger: serializationErrorsLogger,
+            logger: proxyLogger
         )
         
         self.init(
@@ -146,7 +157,29 @@ extension EventQueueAssembly {
             batchSender: batchSender,
             contextModifier: currentContextManager,
             contextProvider: currentContextManager,
-            eventToBatchQueueBridge: eventToBatchQueueBridge
+            eventToBatchQueueBridge: eventToBatchQueueBridge,
+            proxyLogger: proxyLogger
         )
+    }
+}
+
+extension EventQueueAssembly {
+    func update(with loggingPolicy: PaltaAnalytics.LoggingPolicy) {
+        proxyLogger.update(with: loggingPolicy)
+    }
+}
+
+private extension ProxyLogger {
+    func update(with loggingPolicy: PaltaAnalytics.LoggingPolicy) {
+        switch loggingPolicy {
+        case .all:
+            realLogger = PaltaAnalytics.DefaultLogger(messageTypes: .all)
+        case .none:
+            realLogger = nil
+        case .selectedTypes(let types):
+            realLogger = PaltaAnalytics.DefaultLogger(messageTypes: types)
+        case .custom(let customLogger):
+            realLogger = customLogger
+        }
     }
 }

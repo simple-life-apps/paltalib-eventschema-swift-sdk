@@ -20,6 +20,7 @@ final class BatchSendController {
     private let batchStorage: BatchStorage
     private let batchSender: BatchSender
     private let timer: PaltaTimer
+    private let logger: Logger
     
     private let taskProvider: BatchSendTaskProvider
     
@@ -28,12 +29,14 @@ final class BatchSendController {
         batchStorage: BatchStorage,
         batchSender: BatchSender,
         timer: PaltaTimer,
+        logger: Logger,
         taskProvider: @escaping BatchSendTaskProvider
     ) {
         self.batchQueue = batchQueue
         self.batchStorage = batchStorage
         self.batchSender = batchSender
         self.timer = timer
+        self.logger = logger
         self.taskProvider = taskProvider
         
         setup()
@@ -70,7 +73,7 @@ final class BatchSendController {
         do {
             try batchStorage.removeBatch(batch)
         } catch {
-            print("PaltaLib: Analytics: Failed to remove batch due to error: \(error)")
+            logger.log(.error, "Failed to remove batch due to error: \(error)")
         }
         
         isReady = true
@@ -81,13 +84,13 @@ final class BatchSendController {
     private func handle(_ error: CategorisedNetworkError, for task: BatchSendTask) {
         switch error {
         case .notConfigured:
-            print("PaltaLib: Analytics: Batch send failed due to SDK misconfiguration")
+            logger.log(.error, "Batch send failed due to SDK misconfiguration")
             
         case .badRequest:
-            print("PaltaLib: Analytics: Batch send failed due to serialization error")
+            logger.log(.error, "Batch send failed due to serialization error")
             
         case .unknown:
-            print("PaltaLib: Analytics: Batch send failed due to unknown error")
+            logger.log(.error, "Batch send failed due to unknown error")
             
         default:
             // Expected error, do not log

@@ -21,6 +21,7 @@ final class EventFacadeImpl: EventFacade {
     private let contextProvider: CurrentContextProvider
     private let backgroundNotifier: BackgroundNotifier
     private let errorLogger: ErrorsCollector
+    private let logger: Logger
 
     init(
         stack: Stack,
@@ -30,7 +31,8 @@ final class EventFacadeImpl: EventFacade {
         sessionManager: SessionManager,
         contextProvider: CurrentContextProvider,
         backgroundNotifier: BackgroundNotifier,
-        errorLogger: ErrorsCollector
+        errorLogger: ErrorsCollector,
+        logger: Logger
     ) {
         self.stack = stack
         self.core = core
@@ -40,6 +42,7 @@ final class EventFacadeImpl: EventFacade {
         self.contextProvider = contextProvider
         self.backgroundNotifier = backgroundNotifier
         self.errorLogger = errorLogger
+        self.logger = logger
 
         setupCore(core, liveQueue: false)
         startSessionManager()
@@ -55,7 +58,7 @@ final class EventFacadeImpl: EventFacade {
                 skipRefreshSession: false
             )
         } catch {
-            print("PaltaLib: Analytics: Failed to serialize event due to error: \(error)")
+            logger.log(.error, "Failed to serialize event due to error: \(error)")
             errorLogger.logError(error.localizedDescription)
         }
     }

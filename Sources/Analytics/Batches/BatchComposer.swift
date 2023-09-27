@@ -29,6 +29,7 @@ final class BatchComposerImpl: BatchComposer {
     private let deviceInfoProvider: DeviceInfoProvider
     private let networkInfoProvider: NetworkInfoProvider
     private let storageSpaceProvider: StorageSpaceProvider
+    private let logger: Logger
     
     init(
         uuidGenerator: UUIDGenerator,
@@ -36,7 +37,8 @@ final class BatchComposerImpl: BatchComposer {
         userInfoProvider: UserPropertiesProvider,
         deviceInfoProvider: DeviceInfoProvider,
         networkInfoProvider: NetworkInfoProvider,
-        storageSpaceProvider: StorageSpaceProvider
+        storageSpaceProvider: StorageSpaceProvider,
+        logger: Logger
     ) {
         self.uuidGenerator = uuidGenerator
         self.contextProvider = contextProvider
@@ -44,6 +46,7 @@ final class BatchComposerImpl: BatchComposer {
         self.deviceInfoProvider = deviceInfoProvider
         self.networkInfoProvider = networkInfoProvider
         self.storageSpaceProvider = storageSpaceProvider
+        self.logger = logger
     }
     
     func makeBatch(of events: [BatchEvent], with contextId: UUID, triggerType: TriggerType, telemetry: Telemetry) throws -> Batch {
@@ -83,7 +86,7 @@ final class BatchComposerImpl: BatchComposer {
                 from: storageSpaceProvider.getStorageUsagePercentage() as NSNumber
             ) ?? ""
         } catch {
-            print("PaltaLib: Analytics: Error retrieving available space: \(error)")
+            logger.log(.error, "Error retrieving available space: \(error)")
         }
         
         lastBatchFormed = currentTimestamp()

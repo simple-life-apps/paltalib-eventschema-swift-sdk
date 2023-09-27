@@ -26,13 +26,14 @@ final class AnalyticsAssembly {
 }
 
 extension AnalyticsAssembly {
-    convenience init(stack: Stack) throws {
+    convenience init(stack: Stack, loggingPolicy: PaltaAnalytics.LoggingPolicy) throws {
         let coreAssembly = CoreAssembly()
         let analyticsCoreAssembly = AnalyticsCoreAssembly(coreAssembly: coreAssembly)
         let eventQueueAssembly = try EventQueueAssembly(
             stack: stack,
             coreAssembly: coreAssembly,
-            analyticsCoreAssembly: analyticsCoreAssembly
+            analyticsCoreAssembly: analyticsCoreAssembly,
+            loggingPolicy: loggingPolicy
         )
         
         self.init(

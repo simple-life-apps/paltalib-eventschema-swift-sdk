@@ -88,7 +88,8 @@ final class EventToBatchQueueBridgeTests: XCTestCase {
             eventQueue: eventQueueMock,
             batchQueue: batchQueueMock,
             batchComposer: batchComposerMock,
-            batchStorage: storageMock
+            batchStorage: storageMock,
+            logger: DefaultLogger(messageTypes: .all)
         )
     }
 }

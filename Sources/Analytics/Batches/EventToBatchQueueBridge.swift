@@ -13,17 +13,20 @@ final class EventToBatchQueueBridge {
     private let batchQueue: BatchQueue
     private let batchComposer: BatchComposer
     private let batchStorage: BatchStorage
+    private let logger: Logger
     
     init(
         eventQueue: EventQueue,
         batchQueue: BatchQueue,
         batchComposer: BatchComposer,
-        batchStorage: BatchStorage
+        batchStorage: BatchStorage,
+        logger: Logger
     ) {
         self.eventQueue = eventQueue
         self.batchQueue = batchQueue
         self.batchComposer = batchComposer
         self.batchStorage = batchStorage
+        self.logger = logger
         
         setup()
     }
@@ -42,7 +45,7 @@ final class EventToBatchQueueBridge {
             let batches = try batchStorage.loadBatches()
             batches.forEach(batchQueue.addBatch)
         } catch {
-            print("PaltaLib: Analytics: Error loading batches: \(error)")
+            logger.log(.error, "Error loading batches: \(error)")
         }
     }
     
@@ -58,7 +61,7 @@ final class EventToBatchQueueBridge {
             try batchStorage.saveBatch(batch, with: events.keys)
             batchQueue.addBatch(batch)
         } catch {
-            print("PaltaLib: Analytics: Error saving batch: \(error)")
+            logger.log(.error, "Error saving batch: \(error)")
         }
     }
 }

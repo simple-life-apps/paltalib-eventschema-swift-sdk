@@ -28,11 +28,9 @@ final class ConfigurationService {
                 completion(.success(remoteConfig))
 
             case (.failure(let error), let cachedConfig?):
-                print("Error fetching remote config: \(error)")
                 completion(.success(cachedConfig))
 
             case (.failure(let error), nil):
-                print("Error fetching remote config: \(error)")
                 completion(.failure(error))
             }
         }

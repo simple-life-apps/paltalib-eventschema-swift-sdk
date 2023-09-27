@@ -13,10 +13,12 @@ import PaltaAnalyticsPrivateModel
 final class SQLiteStorage {
     private let errorsLogger: ErrorsCollector
     private let client: SQLiteClient
+    private let logger: Logger
     
-    init(errorsLogger: ErrorsCollector, folderURL: URL) throws {
+    init(errorsLogger: ErrorsCollector, folderURL: URL, logger: Logger) throws {
         self.errorsLogger = errorsLogger
         self.client = try SQLiteClient(databaseURL: folderURL.appendingPathComponent("dbv3.sqlite"))
+        self.logger = logger
         
         try populateTables()
     }
@@ -45,7 +47,7 @@ extension SQLiteStorage: EventStorage {
                 try executor.runStep()
             }
         } catch {
-            print("PaltaLib: Analytics: Error saving event: \(error)")
+            logger.log(.error, "Error saving event: \(error)")
             errorsLogger.logError("Store event: \(error.localizedDescription)")
         }
     }
@@ -54,7 +56,7 @@ extension SQLiteStorage: EventStorage {
         do {
             try doRemoveEvent(with: id)
         } catch {
-            print("PaltaLib: Analytics: Error removing event: \(error)")
+            logger.log(.error, "Error removing event: \(error)")
             errorsLogger.logError("Remove event: \(error.localizedDescription)")
         }
     }
@@ -71,7 +73,7 @@ extension SQLiteStorage: EventStorage {
                         let event = try StorableEvent(data: row.column2)
                         results.append(event)
                     } catch {
-                        print("PaltaLib: Analytics: Error loading single event: \(error)")
+                        logger.log(.error, "Error loading single event: \(error)")
                         errorsLogger.logError("Get event: \(error.localizedDescription)")
                     }
                 }
@@ -80,7 +82,7 @@ extension SQLiteStorage: EventStorage {
             }
         } catch {
             results = []
-            print("PaltaLib: Analytics: Error loading events: \(error)")
+            logger.log(.error, "Error loading events: \(error)")
             errorsLogger.logError("Get events: \(error.localizedDescription)")
         }
                 
@@ -106,7 +108,7 @@ extension SQLiteStorage: BatchStorage {
                         let batch = try Batch(data: row.column2)
                         results.append(batch)
                     } catch {
-                        print("PaltaLib: Analytics: Error loading single batch: \(error)")
+                        logger.log(.error, "Error loading single batch: \(error)")
                         errorsLogger.logError("Load single batch: \(error.localizedDescription)")
                     }
                 }

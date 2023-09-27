@@ -22,7 +22,11 @@ final class CurrentContextManagerTests: XCTestCase {
         storageMock = .init()
         stackMock = .mock
         
-        manager = CurrentContextManager(stack: stackMock, storage: storageMock)
+        manager = CurrentContextManager(
+            stack: stackMock,
+            storage: storageMock,
+            logger: DefaultLogger(messageTypes: .all)
+        )
     }
     
     func testModifyContext() {

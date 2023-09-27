@@ -285,6 +285,10 @@ final class SQLiteStorageTests: XCTestCase {
     }
     
     private func reinitStorage() throws {
-        storage = try SQLiteStorage(errorsLogger: errorLoggerMock, folderURL: testURL)
+        storage = try SQLiteStorage(
+            errorsLogger: errorLoggerMock,
+            folderURL: testURL,
+            logger: DefaultLogger(messageTypes: .all)
+        )
     }
 }

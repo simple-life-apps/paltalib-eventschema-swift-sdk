@@ -9,13 +9,14 @@ import Foundation
 
 public extension PaltaAnalytics {
     func setAPIKey(_ apiKey: String, and baseURL: URL? = nil) {
+        let logger = assembly?.eventQueueAssembly.proxyLogger
         assembly?.analyticsCoreAssembly.configurationService.requestConfigs(apiKey: apiKey, host: baseURL) { result in
             switch result {
             case .success(let config):
                 self.apply(config, apiKey: apiKey, baseURL: baseURL)
                 
             case .failure:
-                print("PaltaLib: Analytics: Failed to load remote config. Using default instead")
+                logger?.log(.warning, "Failed to load remote config. Using default instead")
                 self.apply(.default, apiKey: apiKey, baseURL: baseURL)
             }
         }

@@ -158,6 +158,7 @@ final class BatchSendControllerTests: XCTestCase {
             batchStorage: storageMock,
             batchSender: senderMock,
             timer: timerMock,
+            logger: DefaultLogger(messageTypes: .all),
             taskProvider: { [taskMock] _ in return taskMock! }
         )
     }
