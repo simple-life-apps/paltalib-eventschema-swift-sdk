@@ -59,6 +59,11 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
         var context = (_context ?? generateEmptyContext()) as! Context
         editor(&context)
         
+        logger.log(
+            .contextChange,
+            "New context:\n\(prepareLogMessage(for: context))"
+        )
+        
         _currentContextId = UUID()
         do {
             try storage.saveContext(context, with: currentContextId)
@@ -80,5 +85,15 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
     
     private func generateEmptyContext() -> BatchContext {
         stack.context.init()
+    }
+    
+    private func prepareLogMessage(for context: any BatchContext) -> String {
+        String(
+            data: (try? JSONSerialization.data(
+                withJSONObject: context,
+                options: [.prettyPrinted, .sortedKeys]
+            )) ?? Data(),
+            encoding: .utf8
+        ) ?? ""
     }
 }
