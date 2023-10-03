@@ -15,7 +15,7 @@ extension PaltaAnalytics {
         /// Write nothing
         case none
         /// Write selected messages to std out with default logger
-        case selectedTypes(Set<MessageType>)
+        case selectedTypes(LogMessageType)
         /// Use your own custom logger
         case custom(PaltaAnalyticsLogger)
     }
@@ -35,33 +35,44 @@ extension PaltaAnalytics {
 
 extension PaltaAnalytics {
     /// Determines an origin of log message, for example event sent or error occured.
-    public enum MessageType: CaseIterable {
+    public struct LogMessageType: OptionSet {
+        public typealias RawValue = Int
+        
         /// A message is logged due to error occured
-        case error
+        public static let error = LogMessageType(rawValue: 1)
         /// A message is logged to warn developer
-        case warning
+        public static let warning = LogMessageType(rawValue: 1 << 1)
         /// A message is logged when regular lifecycle event occures, for example initializtion is complete or batch is sent.
-        case lifecycle
+        public static let lifecycle = LogMessageType(rawValue: 1 << 2)
         /// A message is logged when new event is reported to the SDK.
-        case event
+        public static let event = LogMessageType(rawValue: 1 << 3)
         /// A message is logged when context was changed
-        case contextChange
+        public static let contextChange = LogMessageType(rawValue: 1 << 4)
+        
+        public static let all: LogMessageType = [.error, .warning, .lifecycle, .event, .contextChange]
+        public static let excludingUsage: LogMessageType = [.error, .warning, .lifecycle,]
+        
+        public let rawValue: RawValue
+        
+        public init(rawValue: RawValue) {
+            self.rawValue = rawValue
+        }
     }
 }
 
 public protocol PaltaAnalyticsLogger {
-    func log(_ type: PaltaAnalytics.MessageType, _ message: String)
+    func log(_ type: PaltaAnalytics.LogMessageType, _ message: String)
 }
 
 extension PaltaAnalytics {
     public final class DefaultLogger: PaltaAnalyticsLogger {
-        public let messageTypes: Set<MessageType>
+        public let messageTypes: LogMessageType
         
-        public init(messageTypes: Set<MessageType>) {
+        public init(messageTypes: LogMessageType) {
             self.messageTypes = messageTypes
         }
         
-        public func log(_ type: PaltaAnalytics.MessageType, _ message: String) {
+        public func log(_ type: PaltaAnalytics.LogMessageType, _ message: String) {
             guard messageTypes.contains(type) else {
                 return
             }
@@ -79,6 +90,9 @@ extension PaltaAnalytics {
                 prefix = "⬆️⬆️⬆️ New analytics event was reported:\n\n"
             case .contextChange:
                 prefix = "🔄🔄🔄 Analytics context was updated:\n\n"
+            default:
+                assertionFailure()
+                return
             }
             
             print(prefix + message)
@@ -88,7 +102,3 @@ extension PaltaAnalytics {
 
 typealias Logger = PaltaAnalyticsLogger
 typealias DefaultLogger = PaltaAnalytics.DefaultLogger
-
-extension Set where Element == PaltaAnalytics.MessageType {
-    static let all = Set(PaltaAnalytics.MessageType.allCases)
-}

@@ -10,7 +10,7 @@ import Foundation
 final class ProxyLogger: PaltaAnalyticsLogger {
     var realLogger: PaltaAnalyticsLogger?
     
-    func log(_ type: PaltaAnalytics.MessageType, _ message: String) {
+    func log(_ type: PaltaAnalytics.LogMessageType, _ message: String) {
         realLogger?.log(type, message)
     }
 }
