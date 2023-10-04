@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import os
 
 extension PaltaAnalytics {
     /// Tells Palta SDK what and how to output to the log.
@@ -78,24 +79,32 @@ extension PaltaAnalytics {
             }
             
             let prefix: String
+            let logLevel: os.OSLogType
             
             switch type {
             case .error:
                 prefix = "🚨🚨🚨 Palta Analytics error: "
+                logLevel = .error
             case .warning:
                 prefix = "⚠️ Palta Analytics warning: "
+                logLevel = .default
             case .lifecycle:
                 prefix = "PaltaAnalytics: "
+                logLevel = .default
             case .event:
                 prefix = "⬆️⬆️⬆️ New analytics event was reported:\n\n"
+                logLevel = .info
             case .contextChange:
                 prefix = "🔄🔄🔄 Analytics context was updated:\n\n"
+                logLevel = .info
             default:
                 assertionFailure()
                 return
             }
             
-            print(prefix + message)
+            let finalMessage = prefix + message
+            print(finalMessage)
+            os_log(logLevel, "%@", finalMessage as NSString)
         }
     }
 }
