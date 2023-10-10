@@ -6,7 +6,9 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
+#endif
 
 protocol BackgroundNotifier {
     func addListener(_ listener: @escaping () -> Void)
@@ -23,6 +25,7 @@ final class BackgroundNotifierImpl: BackgroundNotifier {
     private var token: Any?
     
     init(notificationCenter: NotificationCenter) {
+        #if canImport(UIKit)
         token = notificationCenter.addObserver(
             forName: UIApplication.didEnterBackgroundNotification,
             object: nil,
@@ -30,6 +33,7 @@ final class BackgroundNotifierImpl: BackgroundNotifier {
         ) { [weak self] _ in
             self?.listeners.forEach { $0() }
         }
+        #endif
     }
     
     func addListener(_ listener: @escaping () -> Void) {

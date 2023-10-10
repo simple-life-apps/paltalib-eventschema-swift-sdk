@@ -6,8 +6,11 @@
 //
 
 import Foundation
-import UIKit
 import PaltaAnalyticsModel
+
+#if canImport(UIKit)
+import UIKit
+#endif
 
 protocol SessionProvider {
     var sessionId: Int { get }
@@ -86,9 +89,11 @@ final class SessionManagerImpl: SessionManager, SessionProvider {
 
     func start() {
         let work = {
+            #if canImport(UIKit)
             guard UIApplication.shared.applicationState != .background else {
                 return
             }
+            #endif
 
             self.onBecomeActive()
         }
@@ -107,12 +112,14 @@ final class SessionManagerImpl: SessionManager, SessionProvider {
     }
 
     private func subscribeForNotifications() {
+        #if canImport(UIKit)
         subscriptionToken = notificationCenter.addObserver(
             forName: UIApplication.didBecomeActiveNotification,
             object: nil,
             queue: .main,
             using: { [weak self] _ in self?.onBecomeActive()  }
         )
+        #endif
     }
 
     private func onBecomeActive() {

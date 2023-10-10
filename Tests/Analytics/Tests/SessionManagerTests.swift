@@ -80,6 +80,8 @@ final class SessionManagerTests: XCTestCase {
         
         XCTAssertEqual(sessionManager.nextEventNumber(), 0)
     }
+    
+    #if canImport(UIKit)
 
     func testAppBecomeActive() {
         let newSessionLogged = expectation(description: "New session logged")
@@ -97,6 +99,8 @@ final class SessionManagerTests: XCTestCase {
         
         XCTAssertEqual(sessionManager.nextEventNumber(), 0)
     }
+    
+    #endif
 
     func testRefreshSessionValid() throws {
         let initialSessionId = sessionManager.sessionId

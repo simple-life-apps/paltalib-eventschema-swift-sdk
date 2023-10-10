@@ -5,6 +5,8 @@
 //  Created by Vyacheslav Beltyukov on 29/09/2022.
 //
 
+#if canImport(UIKit)
+
 import Foundation
 import XCTest
 @testable import PaltaAnalytics
@@ -71,3 +73,5 @@ final class BackgroundNotifierTests: XCTestCase {
         wait(for: [blockCalled], timeout: 0.5)
     }
 }
+
+#endif

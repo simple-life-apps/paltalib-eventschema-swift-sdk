@@ -6,10 +6,13 @@
 //
 
 import Foundation
-import UIKit
 import CoreTelephony
 import AdSupport
 import AppTrackingTransparency
+
+#if canImport(UIKit)
+import UIKit
+#endif
 
 public protocol DeviceInfoProvider {
     var osVersion: String { get }
@@ -25,7 +28,11 @@ public protocol DeviceInfoProvider {
 
 final class DeviceInfoProviderImpl: DeviceInfoProvider {
     var osVersion: String {
+        #if canImport(UIKit)
         UIDevice.current.systemVersion
+        #else
+        "Doesn't work on Mac"
+        #endif
     }
 
     var appVersion: String {
@@ -55,6 +62,7 @@ final class DeviceInfoProviderImpl: DeviceInfoProvider {
     }()
 
     var carrier: String {
+#if canImport(UIKit)
         let defaultValue = "Unknown"
         if #available(iOS 12.0, *) {
             let carriersString = CTTelephonyNetworkInfo()
@@ -70,6 +78,9 @@ final class DeviceInfoProviderImpl: DeviceInfoProvider {
                 .carrierName
             ?? defaultValue
         }
+#else
+        return "Doesn't work on Mac"
+#endif
     }
 
     var country: String? {
@@ -99,7 +110,12 @@ final class DeviceInfoProviderImpl: DeviceInfoProvider {
     }
 
     let idfv: String = {
+        
+#if canImport(UIKit)
         let closure = { UIDevice.current.identifierForVendor?.uuidString ?? "" }
+#else
+        let closure = { return "Not working on Mac" }
+#endif
 
         if Thread.isMainThread {
             return closure()
