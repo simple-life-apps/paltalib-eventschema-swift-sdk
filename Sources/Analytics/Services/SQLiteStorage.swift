@@ -47,7 +47,7 @@ extension SQLiteStorage: EventStorage {
                 try executor.runStep()
             }
         } catch {
-            logger.log(.error, "Error saving event: \(error)")
+            logger.log(.error(error, "Error saving event: \(error)"))
             errorsLogger.logError("Store event: \(error.localizedDescription)")
         }
     }
@@ -56,7 +56,7 @@ extension SQLiteStorage: EventStorage {
         do {
             try doRemoveEvent(with: id)
         } catch {
-            logger.log(.error, "Error removing event: \(error)")
+            logger.log(.error(error, "Error removing event: \(error)"))
             errorsLogger.logError("Remove event: \(error.localizedDescription)")
         }
     }
@@ -73,7 +73,7 @@ extension SQLiteStorage: EventStorage {
                         let event = try StorableEvent(data: row.column2)
                         results.append(event)
                     } catch {
-                        logger.log(.error, "Error loading single event: \(error)")
+                        logger.log(.error(error, "Error loading single event: \(error)"))
                         errorsLogger.logError("Get event: \(error.localizedDescription)")
                     }
                 }
@@ -82,7 +82,7 @@ extension SQLiteStorage: EventStorage {
             }
         } catch {
             results = []
-            logger.log(.error, "Error loading events: \(error)")
+            logger.log(.error(error, "Error loading events: \(error)"))
             errorsLogger.logError("Get events: \(error.localizedDescription)")
         }
                 
@@ -108,7 +108,7 @@ extension SQLiteStorage: BatchStorage {
                         let batch = try Batch(data: row.column2)
                         results.append(batch)
                     } catch {
-                        logger.log(.error, "Error loading single batch: \(error)")
+                        logger.log(.error(error, "Error loading single batch: \(error)"))
                         errorsLogger.logError("Load single batch: \(error.localizedDescription)")
                     }
                 }

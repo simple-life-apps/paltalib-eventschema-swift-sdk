@@ -86,7 +86,7 @@ final class BatchComposerImpl: BatchComposer {
                 from: storageSpaceProvider.getStorageUsagePercentage() as NSNumber
             ) ?? ""
         } catch {
-            logger.log(.error, "Error retrieving available space: \(error)")
+            logger.log(.error(error, "Error retrieving available space: \(error)"))
         }
         
         lastBatchFormed = currentTimestamp()

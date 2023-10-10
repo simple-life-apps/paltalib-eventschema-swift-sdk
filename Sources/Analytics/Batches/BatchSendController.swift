@@ -73,7 +73,7 @@ final class BatchSendController {
         do {
             try batchStorage.removeBatch(batch)
         } catch {
-            logger.log(.error, "Failed to remove batch due to error: \(error)")
+            logger.log(.error(error, "Failed to remove batch due to error: \(error)"))
         }
         
         isReady = true
@@ -84,13 +84,13 @@ final class BatchSendController {
     private func handle(_ error: CategorisedNetworkError, for task: BatchSendTask) {
         switch error {
         case .notConfigured:
-            logger.log(.error, "Batch send failed due to SDK misconfiguration")
+            logger.log(.error(error, "Batch send failed due to SDK misconfiguration"))
             
         case .badRequest:
-            logger.log(.error, "Batch send failed due to serialization error")
+            logger.log(.error(error, "Batch send failed due to serialization error"))
             
         case .unknown:
-            logger.log(.error, "Batch send failed due to unknown error")
+            logger.log(.error(error, "Batch send failed due to unknown error"))
             
         default:
             // Expected error, do not log

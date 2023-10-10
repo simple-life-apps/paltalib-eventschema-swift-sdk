@@ -59,16 +59,13 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
         var context = (_context ?? generateEmptyContext()) as! Context
         editor(&context)
         
-        logger.log(
-            .contextChange,
-            "New context:\n\(prepareLogMessage(for: context))"
-        )
+        logger.log(.contextChange(context))
         
         _currentContextId = UUID()
         do {
             try storage.saveContext(context, with: currentContextId)
         } catch {
-            logger.log(.error, "Error saving context: \(context)")
+            logger.log(.error(error, "Error saving context: \(context)"))
         }
         
         _context = context
@@ -79,21 +76,11 @@ final class CurrentContextManager: ContextModifier, CurrentContextProvider {
         do {
             try storage.stripContexts(excluding: contextIds)
         } catch {
-            logger.log(.error, "Error stripping contexts: \(context)")
+            logger.log(.error(error, "Error stripping contexts: \(context)"))
         }
     }
     
     private func generateEmptyContext() -> BatchContext {
         stack.context.init()
-    }
-    
-    private func prepareLogMessage(for context: any BatchContext) -> String {
-        String(
-            data: (try? JSONSerialization.data(
-                withJSONObject: context.asJSON(),
-                options: [.prettyPrinted, .sortedKeys]
-            )) ?? Data(),
-            encoding: .utf8
-        ) ?? ""
     }
 }

@@ -16,7 +16,7 @@ public extension PaltaAnalytics {
                 self.apply(config, apiKey: apiKey, baseURL: baseURL)
                 
             case .failure:
-                logger?.log(.warning, "Failed to load remote config. Using default instead")
+                logger?.log(.warning("Failed to load remote config. Using default instead"))
                 self.apply(.default, apiKey: apiKey, baseURL: baseURL)
             }
         }

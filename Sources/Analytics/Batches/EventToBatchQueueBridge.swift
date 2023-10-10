@@ -45,7 +45,7 @@ final class EventToBatchQueueBridge {
             let batches = try batchStorage.loadBatches()
             batches.forEach(batchQueue.addBatch)
         } catch {
-            logger.log(.error, "Error loading batches: \(error)")
+            logger.log(.error(error, "Error loading batches: \(error)"))
         }
     }
     
@@ -61,7 +61,7 @@ final class EventToBatchQueueBridge {
             try batchStorage.saveBatch(batch, with: events.keys)
             batchQueue.addBatch(batch)
         } catch {
-            logger.log(.error, "Error saving batch: \(error)")
+            logger.log(.error(error, "Error saving batch: \(error)"))
         }
     }
 }

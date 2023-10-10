@@ -7,6 +7,7 @@
 
 import Foundation
 import os
+import PaltaAnalyticsModel
 
 extension PaltaAnalytics {
     /// Tells Palta SDK what and how to output to the log.
@@ -61,8 +62,33 @@ extension PaltaAnalytics {
     }
 }
 
+extension PaltaAnalytics {
+    public enum LogMessage {
+        case error(Error, String)
+        case warning(String)
+        case lifecycle(String)
+        case event(any Event)
+        case contextChange(any BatchContext)
+        
+        var type: LogMessageType {
+            switch self {
+            case .error:
+                return .error
+            case .warning:
+                return .warning
+            case .lifecycle:
+                return .lifecycle
+            case .event:
+                return .event
+            case .contextChange:
+                return .contextChange
+            }
+        }
+    }
+}
+
 public protocol PaltaAnalyticsLogger {
-    func log(_ type: PaltaAnalytics.LogMessageType, _ message: String)
+    func log(_ message: PaltaAnalytics.LogMessage)
 }
 
 extension PaltaAnalytics {
@@ -73,36 +99,32 @@ extension PaltaAnalytics {
             self.messageTypes = messageTypes
         }
         
-        public func log(_ type: PaltaAnalytics.LogMessageType, _ message: String) {
-            guard messageTypes.contains(type) else {
+        public func log(_ message: PaltaAnalytics.LogMessage) {
+            guard messageTypes.contains(message.type) else {
                 return
             }
             
-            let prefix: String
+            let finalMessage: String
             let logLevel: os.OSLogType
             
-            switch type {
-            case .error:
-                prefix = "🚨🚨🚨 Palta Analytics error: "
+            switch message {
+            case let .error(_, errorMessage):
+                finalMessage = "🚨🚨🚨 Palta Analytics error: \(errorMessage)"
                 logLevel = .error
-            case .warning:
-                prefix = "⚠️ Palta Analytics warning: "
+            case let .warning(warning):
+                finalMessage = "⚠️ Palta Analytics warning: \(warning)"
                 logLevel = .default
-            case .lifecycle:
-                prefix = "PaltaAnalytics: "
+            case let .lifecycle(message):
+                finalMessage = "PaltaAnalytics: \(message)"
                 logLevel = .default
-            case .event:
-                prefix = "⬆️⬆️⬆️ New analytics event was reported:\n\n"
+            case let .event(event):
+                finalMessage = "⬆️⬆️⬆️ New event! Event name: \(event.name). Properties: \(event.asJSON())"
                 logLevel = .info
-            case .contextChange:
-                prefix = "🔄🔄🔄 Analytics context was updated:\n\n"
+            case let .contextChange(context):
+                finalMessage = "🔄🔄🔄 Analytics context was updated. New context: \(context.asJSON())"
                 logLevel = .info
-            default:
-                assertionFailure()
-                return
             }
             
-            let finalMessage = prefix + message
             print(finalMessage)
             os_log(logLevel, "%@", finalMessage as NSString)
         }

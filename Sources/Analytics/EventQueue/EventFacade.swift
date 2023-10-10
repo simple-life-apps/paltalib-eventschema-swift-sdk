@@ -51,7 +51,7 @@ final class EventFacadeImpl: EventFacade {
     
     func logEvent<E: Event>(_ incomingEvent: E) {
         do {
-            logger.log(.event, prepareLogMessage(for: incomingEvent))
+            logger.log(.event(incomingEvent))
             logEvent(
                 with: try incomingEvent.header?.serialized(),
                 and: try incomingEvent.payload.serialized(),
@@ -59,7 +59,7 @@ final class EventFacadeImpl: EventFacade {
                 skipRefreshSession: false
             )
         } catch {
-            logger.log(.error, "Failed to serialize event due to error: \(error)")
+            logger.log(.error(error, "Failed to serialize event due to error: \(error)"))
             errorLogger.logError(error.localizedDescription)
         }
     }
