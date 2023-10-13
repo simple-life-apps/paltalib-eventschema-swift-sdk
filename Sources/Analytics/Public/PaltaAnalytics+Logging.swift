@@ -119,10 +119,10 @@ extension PaltaAnalytics {
                 logLevel = .default
             case let .event(event):
                 finalMessage = "⬆️⬆️⬆️ New event! Event name: \(event.name). Properties: \(event.asJSON())"
-                logLevel = .info
+                logLevel = .error
             case let .contextChange(context):
                 finalMessage = "🔄🔄🔄 Analytics context was updated. New context: \(context.asJSON())"
-                logLevel = .info
+                logLevel = .error
             }
             
             print(finalMessage)
