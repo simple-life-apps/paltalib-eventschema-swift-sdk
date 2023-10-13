@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
 
   spec.name         = "PaltaAnalyticsPrivateModel"
-  spec.version      = "3.8.0"
+  spec.version      = "3.9.0"
   spec.summary      = "A short description of PaltaAnalyticsPrivateModel."
 
   spec.homepage     = "https://github.com/Palta-Data-Platform/paltalib-eventschema-swift-sdk"
