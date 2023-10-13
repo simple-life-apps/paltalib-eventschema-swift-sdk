@@ -95,6 +95,8 @@ extension PaltaAnalytics {
     public final class DefaultLogger: PaltaAnalyticsLogger {
         public let messageTypes: LogMessageType
         
+        private let log = OSLog(subsystem: "PaltaAnalytics", category: "Analytics")
+        
         public init(messageTypes: LogMessageType) {
             self.messageTypes = messageTypes
         }
@@ -126,7 +128,7 @@ extension PaltaAnalytics {
             }
             
             print(finalMessage)
-            os_log(logLevel, "%@", finalMessage as NSString)
+            os_log(logLevel, log: log, "%@", finalMessage as NSString)
         }
     }
 }
