@@ -128,7 +128,7 @@ extension PaltaAnalytics {
             }
             
             print(finalMessage)
-            os_log(logLevel, log: log, "%@", finalMessage as NSString)
+            os_log(logLevel, log: log, "%{public}@", finalMessage as NSString)
         }
     }
 }
