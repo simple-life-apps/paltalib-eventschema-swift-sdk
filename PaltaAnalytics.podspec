@@ -11,7 +11,7 @@ Pod::Spec.new do |spec|
   spec.author       = { "Vyacheslav Beltyukov" => "vyacheslav.beltyukov@palta.com" }
 
   spec.platform     = :ios
-  spec.platform     = :ios, "11.0"
+  spec.platform     = :ios, "14.0"
 
   spec.source       = { :git => "https://github.com/Palta-Data-Platform/paltalib-eventschema-swift-sdk.git", :tag => "#{spec.version}" }
 
