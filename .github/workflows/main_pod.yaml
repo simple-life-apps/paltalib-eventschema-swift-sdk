@@ -20,10 +20,9 @@ jobs:
         pod repo update
         pod trunk push PaltaAnalytics.podspec --allow-warnings
     - name: Merge to main
-      uses: devmasx/merge-branch@master
+      uses: devvspaces/merge-branches@v1
       with:
-        type: now
+        token: ${{ github.token }}
         from_branch: ${{ inputs.branch }}
-        target_branch: main
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        to_branch: main
       
