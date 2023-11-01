@@ -23,6 +23,6 @@ jobs:
       uses: devvspaces/merge-branches@v1
       with:
         token: ${{ github.token }}
-        from_branch: ${{ inputs.branch }}
+        from_branch: ${{ inputs.branch || github.context.ref }}
         to_branch: main
       
