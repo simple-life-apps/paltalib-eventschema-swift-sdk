@@ -1,1 +1,1 @@
-let global_sdkVersion = "3.9.2"
+let global_sdkVersion = "3.9.3"
