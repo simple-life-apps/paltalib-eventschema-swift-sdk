@@ -52,6 +52,10 @@ The most crucial task of SDK is to ensure events delivery. This SDK shows averag
 ### Retry policy
 All unsuccessful batch sends are retried. The only exception is when it 401 error. In this case, we drop the batch because most probably API token was revoked.
 Retry intervals grow exponentially with adding some random timeout to exclude DDoSing our own servers.
+### Events storage
+All events are stored as soon as they are received by SDK. They are deleted only after successful sending to the backend.
 
 ## Miscellaneous
-TBD
+- You can mock current timestamp in unit tests. See `Timestamp.swift`
+- You can fire timers manually in unit tests. See `PaltaTimer.swift`
+- This SDK uses UUIDv7. Custom implementation is contained in `UUIDGenerator.swift`
