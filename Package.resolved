@@ -5,14 +5,14 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/krzysztofzablocki/Difference.git",
       "state" : {
-        "revision" : "f627d00718033c3d7888acd5f4e3524a843db1cf",
-        "version" : "1.0.2"
+        "revision" : "7eb73c5d28c87dd6c4bac805aa28f757648aa92c",
+        "version" : "1.1.0"
       }
     },
     {
       "identity" : "paltalib-swift-core",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Palta-Data-Platform/paltalib-swift-core.git",
+      "location" : "https://github.com/simple-life-apps/paltalib-swift-core.git",
       "state" : {
         "revision" : "dfecba968badba929d2c47394de7c7286b6fcdbe",
         "version" : "3.2.2"
@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-protobuf.git",
       "state" : {
-        "revision" : "ab3a58b7209a17d781c0d1dbb3e1ff3da306bae8",
-        "version" : "1.20.3"
+        "revision" : "564597ad2fe2513a94dd8f3ba27ea2ff4be3cb37",
+        "version" : "1.28.0"
       }
     }
   ],
