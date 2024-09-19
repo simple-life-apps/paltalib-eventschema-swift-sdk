@@ -14,8 +14,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/simple-life-apps/paltalib-swift-core.git",
       "state" : {
-        "revision" : "dfecba968badba929d2c47394de7c7286b6fcdbe",
-        "version" : "3.2.2"
+        "revision" : "1f285d53e2bb02d69d701ecbe303a504e1488555",
+        "version" : "3.2.3"
       }
     },
     {
