@@ -27,7 +27,7 @@ final class ConfigurationService {
                 self?.cachedConfig = remoteConfig
                 completion(.success(remoteConfig))
 
-            case (.failure(let error), let cachedConfig?):
+            case (.failure, let cachedConfig?):
                 completion(.success(cachedConfig))
 
             case (.failure(let error), nil):

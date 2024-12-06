@@ -30,7 +30,7 @@ struct BatchContextMock: BatchContext, Equatable {
         return data
     }
     
-    func asJSON() -> [String : Any] {
+    func asJSON() -> [String : Sendable] {
         [:]
     }
 }

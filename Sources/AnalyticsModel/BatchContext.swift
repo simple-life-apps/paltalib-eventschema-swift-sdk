@@ -12,5 +12,5 @@ public protocol BatchContext {
     init(data: Data) throws
     
     func serialize() throws -> Data
-    func asJSON() -> [String: Any]
+    func asJSON() -> [String: Sendable]
 }

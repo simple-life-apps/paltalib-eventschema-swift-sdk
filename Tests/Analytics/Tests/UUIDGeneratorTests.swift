@@ -93,7 +93,7 @@ final class UUIDGeneratorTests: XCTestCase {
     }
 }
 
-extension UUID: Comparable {
+extension UUID: Swift.Comparable {
     public static func < (lhs: UUID, rhs: UUID) -> Bool {
         if lhs.uuid.0 != rhs.uuid.0 {
             return lhs.uuid.0 < rhs.uuid.0

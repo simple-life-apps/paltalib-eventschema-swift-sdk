@@ -15,6 +15,6 @@ public protocol Event {
     var payload: Payload { get }
     var name: String { get }
     
-    func asJSON() -> [String: Any]
-    func asJSON(withContext: Bool) -> [String: Any]
+    func asJSON() -> [String: Sendable]
+    func asJSON(withContext: Bool) -> [String: Sendable]
 }

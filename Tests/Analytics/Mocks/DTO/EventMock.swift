@@ -30,11 +30,11 @@ final class EventMock: Event {
         0
     }
     
-    func asJSON() -> [String : Any] {
+    func asJSON() -> [String : Sendable] {
         [:]
     }
     
-    func asJSON(withContext: Bool) -> [String : Any] {
+    func asJSON(withContext: Bool) -> [String : Sendable] {
         [:]
     }
 }
